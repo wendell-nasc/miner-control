@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # URL do arquivo no GitHub
-URL="https://github.com/wendell-nasc/miner-control/blob/main/cpu/service-control-miner.sh"
+URL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/cpu/service-control-miner.sh"
 
 # Caminho do arquivo local
 ARQUIVO_LOCAL="/etc/systemd/system/start-xdag_gustavo.sh"
@@ -23,10 +23,12 @@ done
 
 
 # Comparar e atualizar automaticamente
-if curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; then
+if ! curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; then
     echo "$(date): Arquivo diferente. Atualizando..." >> $LOGFILE
     # Baixar e substituir o arquivo local
+    sudo rm -r $ARQUIVO_LOCAL
     sudo curl -s $URL -o $ARQUIVO_LOCAL
+    sudo chmod +x $ARQUIVO_LOCAL
     echo "$(date): Arquivo atualizado !!!" >> $LOGFILE
     # Reiniciar o serviço
     echo "$(date): Reiniciando o servico ..." >> $LOGFILE
