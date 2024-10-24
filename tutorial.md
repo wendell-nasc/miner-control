@@ -11,3 +11,15 @@ git push -u origin main
 git remote add origin git@github.com:wendell-nasc/miner-control.git
 git branch -M main
 git push -u origin main
+
+
+# CONTROL
+
+sudo touch /var/log/control_miner.log
+sudo nano /opt/service-control.sh
+sudo chmod +x /opt/service-control.sh
+sudo EDITOR=nano crontab -e
+*/2 * * * * /opt/service-control.sh
+tail -f /var/log/control_miner.log
+
+

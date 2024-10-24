@@ -49,3 +49,5 @@ echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
 wait
 
 echo "Mineradores iniciados."
+
+#teste
