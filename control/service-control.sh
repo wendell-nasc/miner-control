@@ -32,7 +32,7 @@ if ! curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; th
     echo "$(date): Arquivo atualizado !!!" >> $LOGFILE
     # Reiniciar o serviço
     echo "$(date): Reiniciando o servico ..." >> $LOGFILE
-    sudo systemctl restart $SERVICO
+    sudo systemctl daemon-reload && sudo systemctl restart $SERVICO
     echo "$(date): Servico reiniciado !!!" >> $LOGFILE
 else
     echo "$(date): O arquivo já está atualizado." >> $LOGFILE

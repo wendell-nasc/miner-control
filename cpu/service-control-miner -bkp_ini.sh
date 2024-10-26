@@ -16,21 +16,13 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
+
 # Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
+#DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
+DEROLUNA_BINARY="/home/wendell/hansen/hansen33s-dero-miner-linux-amd64"
 DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
 DEROLUNA_THREADS=$(nproc)
-
-# Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$DEROLUNA_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$DEROLUNA_LOGFILE"
-    wget https://github.com/Hansen333/Hansen33-s-DERO-Miner/releases/latest/download/hansen33s-dero-miner-linux-amd64.tar.gz -P /home/wendell/dero_linux_amd64
-    sudo tar -xvf /home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64.tar.gz -C /home/wendell/dero_linux_amd64
-    echo "Minerador baixado e extraído." >> "$DEROLUNA_LOGFILE"
-else
-    echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
-fi
 
 # Iniciar o minerador Deroluna
 echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
@@ -40,7 +32,6 @@ echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
 wait
 
 echo "Mineradores iniciados."
-
 
 # sudo chmod +x /home/wendell/hansen/hansen.sh && sudo nano /etc/systemd/system/dero_hansen.service
 
