@@ -16,8 +16,6 @@ git push -u origin main
 
 # geral
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
-sudo nano /etc/systemd/system/start-xdag_gustavo.sh
-
 
 
 # CONTROL
@@ -31,7 +29,7 @@ sudo systemctl daemon-reload && sudo systemctl enable xdag_gustavo.service && su
 
 
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
-sudo systemctl daemon-reload && sudo systemctl start xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
 
 sudo systemctl stop xdag_gustavo.service
 sudo systemctl start xdag_gustavo.service

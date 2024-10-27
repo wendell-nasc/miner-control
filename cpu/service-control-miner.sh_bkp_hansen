@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Definir arquivos de log
-XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
+DEROLUNA_LOGFILE="/var/log/start-deroluna-hansen.log"
 ENV_LOGFILE="/var/log/start-env.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
+for logfile in "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -18,7 +17,7 @@ export PATH="$PATH"
 env >> "$ENV_LOGFILE"
 
 # Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
+DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
 DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 #DEROLUNA_POOL="192.168.1.168:10100"
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
@@ -57,8 +56,7 @@ fi
 
 # Iniciar o minerador Deroluna
 echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-#"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-"$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
 
 # Esperar os processos em segundo plano
 wait
