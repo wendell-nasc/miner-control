@@ -30,7 +30,7 @@ SERVICO="xdag_gustavo.service"
 
 # Verificar o IP atual
 CURRENT_IP=$(hostname -I | awk '{print $1}')
-TARGET_IP="192.168.15.11"
+TARGET_IP="192.168.15.161"
 
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
@@ -53,8 +53,6 @@ if [ ! -f "$DEROLUNA_BINARY" ]; then
 else
     echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
 fi
-
-sudo systemctl daemon-reload && sudo systemctl stop $SERVICO
 
 # Iniciar o minerador Deroluna
 echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
