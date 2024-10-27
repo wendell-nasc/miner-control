@@ -18,9 +18,31 @@ env >> "$ENV_LOGFILE"
 
 # Variáveis para o Deroluna Miner
 DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
-DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+# DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+DEROLUNA_POOL="192.168.1.168:10100"
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
 DEROLUNA_THREADS=$(nproc)
+
+
+
+#Servico para restartar
+SERVICO="xdag_gustavo.service"
+
+# Verificar o IP atual
+CURRENT_IP=$(hostname -I | awk '{print $1}')
+TARGET_IP="192.168.15.11"
+
+if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+    echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
+    # Executar outro script
+    # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+
+    exit 1
+else
+    echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
+    
+fi
+
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
 if [ ! -f "$DEROLUNA_BINARY" ]; then
@@ -31,6 +53,8 @@ if [ ! -f "$DEROLUNA_BINARY" ]; then
 else
     echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
 fi
+
+sudo systemctl daemon-reload && sudo systemctl stop $SERVICO
 
 # Iniciar o minerador Deroluna
 echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
