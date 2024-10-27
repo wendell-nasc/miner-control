@@ -18,8 +18,8 @@ env >> "$ENV_LOGFILE"
 
 # Variáveis para o Deroluna Miner
 DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
-# DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-DEROLUNA_POOL="192.168.1.168:10100"
+DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+#DEROLUNA_POOL="192.168.1.168:10100"
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
 DEROLUNA_THREADS=$(nproc)
 

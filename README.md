@@ -34,6 +34,7 @@ sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
 sudo systemctl daemon-reload && sudo systemctl start xdag_gustavo.service
 
 sudo systemctl stop xdag_gustavo.service
+sudo systemctl start xdag_gustavo.service
 
 
 sudo tail -f /var/log/control_miner.log
