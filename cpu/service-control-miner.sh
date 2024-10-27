@@ -59,7 +59,7 @@ HORA_ATUAL=$(date +%H)
 if [ "$HORA_ATUAL" -ge 0 ] && [ "$HORA_ATUAL" -le 12 ]; then
     DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 else
-    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+    DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
 fi
 
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
