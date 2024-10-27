@@ -25,14 +25,33 @@ sudo chmod +x /opt/service-control.sh && sudo EDITOR=nano crontab -e
 0 */4 * * * systemctl restart xdag_gustavo.service
 */2 * * * * /opt/service-control.sh
 
-sudo systemctl daemon-reload && sudo systemctl enable xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
+
+
+sudo tail -f /var/log/control_miner.log
+sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
+sudo tail -f /var/log/start-deroluna-hansen.log
+
+
+
+
+
+
+# GUSTADVO
+
+
+ xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
+
+
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 
 
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
 sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
 
+
 sudo systemctl stop xdag_gustavo.service
 sudo systemctl start xdag_gustavo.service
+sudo systemctl status xdag_gustavo.service
 
 
 sudo tail -f /var/log/control_miner.log

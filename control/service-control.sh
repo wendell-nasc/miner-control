@@ -20,6 +20,10 @@ for logfile in "$LOGFILE"; do
     chmod 644 "$logfile"
 done
 
+# Atualizar data e hora para o horário do Brasil
+echo "$(date): Atualizando a data e hora para o horário do Brasil..." >> $LOGFILE
+sudo timedatectl set-timezone America/Sao_Paulo
+
 
 
 # Comparar e atualizar automaticamente
