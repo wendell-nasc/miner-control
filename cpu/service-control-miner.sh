@@ -65,5 +65,5 @@ echo "Mineradores iniciados."
 
 
 # sudo chmod +x /home/wendell/hansen/hansen.sh && sudo nano /etc/systemd/system/dero_hansen.service
-
+#testeetstets
 
