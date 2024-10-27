@@ -40,7 +40,7 @@ sudo tail -f /var/log/start-deroluna-hansen.log
 
 
  xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
-
+ sudo systemctl stop xdag_gustavo.service
 
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 

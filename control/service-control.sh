@@ -2,9 +2,11 @@
 
 # URL do arquivo no GitHub
 URL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/cpu/service-control-miner.sh"
+URL_CONTROL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/control/service-control.sh"
 
 # Caminho do arquivo local
 ARQUIVO_LOCAL="/etc/systemd/system/start-xdag_gustavo.sh"
+ARQUIVO_LOCAL_CONTROL="/opt/service-control.sh"
 
 
 # Definir arquivos de log
@@ -33,6 +35,15 @@ if ! curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; th
     sudo rm -r $ARQUIVO_LOCAL
     sudo curl -s $URL -o $ARQUIVO_LOCAL
     sudo chmod +x $ARQUIVO_LOCAL
+
+    sudo rm -r $ARQUIVO_LOCAL_CONTROL
+    sudo curl -s $URL_CONTROL -o $ARQUIVO_LOCAL_CONTROL
+    sudo chmod +x $ARQUIVO_LOCAL_CONTROL
+
+    
+
+
+
     echo "$(date): Arquivo atualizado !!!" >> $LOGFILE
     # Reiniciar o serviço
     echo "$(date): Reiniciando o servico ..." >> $LOGFILE
