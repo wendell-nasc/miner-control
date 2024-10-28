@@ -25,6 +25,21 @@ sudo chmod +x /opt/service-control.sh && sudo EDITOR=nano crontab -e
 0 */4 * * * systemctl restart xdag_gustavo.service
 */2 * * * * /opt/service-control.sh
 
+sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
+30 11 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
+30 23 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
+
+
+-correcao
+192.168.1.64 - rig64-mini-e3_1270
+192.168.1.67 - rig67-asus-i5_-3330
+192.168.1.68 - rig68-mini-i7_3570
+192.168.1.69 - rig HIVE OS [RECUSADO ]
+192.168.1.70 - rig70-asus-i5-3570s
+192.168.1.72 - rig72-asus-E3_1220_V2
+192.168.1.81 - rig81-pcware-i5_2400
+
+
 
 
 sudo tail -f /var/log/control_miner.log

@@ -23,6 +23,8 @@ cd dero_linux_amd64
 sudo screen -S dero-node-carga /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64  
 
 sudo screen -S dero-node /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64 --fastsync 
+
+
 sudo screen -ls ou -r
 
 ser der erro excluir cache maineet
