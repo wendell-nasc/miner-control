@@ -32,18 +32,10 @@ sudo timedatectl set-timezone America/Sao_Paulo
 if ! curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; then
     echo "$(date): Arquivo diferente. Atualizando..." >> $LOGFILE
     # Baixar e substituir o arquivo local
-    sudo rm -r $ARQUIVO_LOCAL
-    sudo curl -s $URL -o $ARQUIVO_LOCAL
-    sudo chmod +x $ARQUIVO_LOCAL
-
-    sudo rm -r $ARQUIVO_LOCAL_CONTROL
-    sudo curl -s $URL_CONTROL -o $ARQUIVO_LOCAL_CONTROL
-    sudo chmod +x $ARQUIVO_LOCAL_CONTROL
+    sudo rm -r $ARQUIVO_LOCAL && sudo curl -s $URL -o $ARQUIVO_LOCAL && sudo chmod 777 $ARQUIVO_LOCAL
+    sudo rm -r $ARQUIVO_LOCAL_CONTROL && sudo curl -s $URL_CONTROL -o $ARQUIVO_LOCAL_CONTROL && sudo chmod 777 $ARQUIVO_LOCAL_CONTROL
 
     
-
-
-
     echo "$(date): Arquivo atualizado !!!" >> $LOGFILE
     # Reiniciar o serviço
     echo "$(date): Reiniciando o servico ..." >> $LOGFILE

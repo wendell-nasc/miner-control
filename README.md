@@ -16,7 +16,7 @@ git push -u origin main
 
 # geral
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
-
+sudo chmod 777 /etc/systemd/system/start-xdag_gustavo.sh
 
 # CONTROL
 
@@ -31,7 +31,7 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 -correcao
 192.168.1.64 - rig64-mini-e3_1270
 192.168.1.67 - rig67-asus-i5_-3330
-192.168.1.68 - rig68-mini-i7_3570
+192.168.1.68 - rig68-mini-i7_3570 - falta
 192.168.1.69 - rig HIVE OS [RECUSADO ]
 192.168.1.70 - rig70-asus-i5-3570s
 192.168.1.72 - rig72-asus-E3_1220_V2
@@ -57,6 +57,7 @@ sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.9/SRB
  sudo systemctl stop xdag_gustavo.service
 
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo chmod +X /etc/systemd/system/start-xdag_gustavo.sh
 
 
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
@@ -71,5 +72,9 @@ sudo systemctl status xdag_gustavo.service
 sudo tail -f /var/log/control_miner.log
 sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
 sudo tail -f /var/log/start-deroluna-hansen.log
+
+
+
+sudo journalctl -f -u  xdag_gustavo.service
 
 cat /var/log/scash.log
