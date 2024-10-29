@@ -23,7 +23,7 @@ SCASH_POOL="stratum-na.rplant.xyz:7019"
 # SCASH_POOL="192.168.1.168:10100"
 SCASH_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
 SCASH_THREADS=$(nproc)
-
+--cpu-threads $(nproc)  
 # Serviço para reiniciar
 SERVICO="xdag_gustavo.service"
 
@@ -57,8 +57,9 @@ fi
 
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
-#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" &
-"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
+"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true &
+#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
+#./SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool eu.rplant.xyz:7019 --wallet "scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)"  --donate-level 1 
 
 
 # Esperar os processos em segundo plano

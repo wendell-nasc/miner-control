@@ -42,15 +42,16 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 
 sudo tail -f /var/log/control_miner.log
 sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
-sudo tail -f /var/log/start-deroluna-hansen.log
+sudo tail -f /var/log/scash.log
 
 
-
+sudo journalctl -f -u  xdag_gustavo.service
 
 
 
 # GUSTADVO
 
+sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.9/SRBMiner-Multi-2-6-9-Linux.tar.gz && sudo tar -xzvf SRBMiner-Multi-2-6-9-Linux.tar.gz
 
  xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
  sudo systemctl stop xdag_gustavo.service
