@@ -45,8 +45,11 @@ if [ ! -f "$SCASH_BINARY" ]; then
     echo "Minerador não encontrado. Baixando e extraindo..." >> "$SCASH_LOGFILE"
     sudo mkdir /home/wendell/SRBMiner    
     cd /home/wendell/SRBMiner
-    sudo sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz -P /home/wendell/SRBMiner
+    sudo sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
+    # Aguardar um pouco
+    sleep 20
     sudo tar -xvf /home/wendell/SRBMiner/SRBMiner-Multi-2-6-5-Linux.tar.gz    
+    sleep 20
     echo "Minerador baixado e extraído." >> "$SCASH_LOGFILE"
 else
     echo "Minerador encontrado. Prosseguindo..." >> "$SCASH_LOGFILE"
