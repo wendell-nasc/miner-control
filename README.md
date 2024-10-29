@@ -21,11 +21,9 @@ sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 # CONTROL
 
 sudo touch /var/log/control_miner.log && sudo nano /opt/service-control.sh
-sudo chmod +x /opt/service-control.sh && sudo EDITOR=nano crontab -e
+sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
 0 */4 * * * systemctl restart xdag_gustavo.service
 */2 * * * * /opt/service-control.sh
-
-sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
 30 11 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
 30 23 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
 
@@ -72,3 +70,5 @@ sudo systemctl status xdag_gustavo.service
 sudo tail -f /var/log/control_miner.log
 sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
 sudo tail -f /var/log/start-deroluna-hansen.log
+
+cat /var/log/scash.log

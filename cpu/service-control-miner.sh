@@ -57,7 +57,9 @@ fi
 
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
-"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" &
+#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" &
+"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
+
 
 # Esperar os processos em segundo plano
 wait
