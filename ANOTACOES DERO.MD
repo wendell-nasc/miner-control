@@ -24,13 +24,16 @@ sudo screen -S dero-node-carga /home/wendell/dNodedata/dero_linux_amd64/derod-li
 
 sudo screen -S dero-node /home/wendell/dero_linux_amd64/derod-linux-amd64 --fastsync 
 
+sudo rsync --inplace --port=2048 -av rsync://141.95.86.80/DEROblockchainDB/mainnet ./
+
+
 
 sudo screen -ls ou -r
 
 ser der erro excluir cache maineet
 sudo rm -rr mainnet
 
-sudo screen -S dero-node-integrator /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64 --integrator-address=dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z --rpc-bind=0.0.0.0:10102 --p2p-bind=0.0.0.0:52672 --add-priority-node=45.82.66.54:8080
+sudo screen -S dero-node-integrator_ok /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64 --integrator-address=dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z --rpc-bind=0.0.0.0:10102 --p2p-bind=0.0.0.0:52672 --add-priority-node=45.82.66.54:8080
 
 
 sudo screen -S dero-node-integrator /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64 
