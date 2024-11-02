@@ -60,8 +60,8 @@ if [ "$HORA_ATUAL" -ge 0 ] && [ "$HORA_ATUAL" -le 12 ]; then
     DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 else
     # DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
-    DEROLUNA_POOL="community-pools.mysrv.cloud:10100"
-    #DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
+    # DEROLUNA_POOL="community-pools.mysrv.cloud:10100"
+    DEROLUNA_POOL="dero-node.mysrv.cloud:10100"
     
     
 fi
