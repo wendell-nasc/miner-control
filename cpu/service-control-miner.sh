@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Definir arquivos de log
-
-SCASH_LOGFILE="/var/log/scash.log"
+XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
+DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
 ENV_LOGFILE="/var/log/start-env.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$SCASH_LOGFILE" "$ENV_LOGFILE"; do
+for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -17,15 +17,15 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o minerador scash
-SCASH_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
-SCASH_POOL="stratum-na.rplant.xyz:7019"
-# SCASH_POOL="192.168.1.168:10100"
-SCASH_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
-SCASH_THREADS=$(nproc)
+# Variáveis para o Deroluna Miner
+DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
+DEROLUNA_POOL="192.168.1.168:10100"
+DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
+DEROLUNA_THREADS=$(nproc)
 
 
-# Serviço para reiniciar
+
+#Servico para restartar
 SERVICO="xdag_gustavo.service"
 
 # Verificar o IP atual
@@ -33,41 +33,38 @@ CURRENT_IP=$(hostname -I | awk '{print $1}')
 TARGET_IP="192.168.15.199"
 
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-    echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$SCASH_LOGFILE"
+    echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
     # Executar outro script
-    # /path/to/outro_script.sh >> "$SCASH_LOGFILE" 2>> /var/log/start-scash-errors.log
+    # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+
     exit 1
 else
-    echo "IP não corresponde. Atual: $CURRENT_IP." >> "$SCASH_LOGFILE"
+    echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
+    
 fi
+
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$SCASH_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$SCASH_LOGFILE"
-    sudo mkdir /home/wendell/SRBMiner    
-    cd /home/wendell/SRBMiner
-    sudo sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
-    # Aguardar um pouco
-    sleep 20
-    sudo tar -xvf /home/wendell/SRBMiner/SRBMiner-Multi-2-6-5-Linux.tar.gz    
-    sleep 20
-    echo "Minerador baixado e extraído." >> "$SCASH_LOGFILE"
+if [ ! -f "$DEROLUNA_BINARY" ]; then
+    echo "Minerador não encontrado. Baixando e extraindo..." >> "$DEROLUNA_LOGFILE"
+    wget https://github.com/Hansen333/Hansen33-s-DERO-Miner/releases/latest/download/hansen33s-dero-miner-linux-amd64.tar.gz -P /home/wendell/dero_linux_amd64
+    sudo tar -xvf /home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64.tar.gz -C /home/wendell/dero_linux_amd64
+    echo "Minerador baixado e extraído." >> "$DEROLUNA_LOGFILE"
 else
-    echo "Minerador encontrado. Prosseguindo..." >> "$SCASH_LOGFILE"
+    echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
 fi
 
-# Iniciar o minerador scash
-echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
-"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true &
-#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
-#./SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool eu.rplant.xyz:7019 --wallet "scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)"  --donate-level 1 --cpu-threads
-
+# Iniciar o minerador Deroluna
+echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+#"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+"$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
 
 # Esperar os processos em segundo plano
 wait
 
 echo "Mineradores iniciados."
 
+
 # sudo chmod +x /home/wendell/hansen/hansen.sh && sudo nano /etc/systemd/system/dero_hansen.service
-# testeetstets
-# 29/10/2024
+#testeetstets
+
