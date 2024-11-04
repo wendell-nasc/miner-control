@@ -28,6 +28,13 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 30 23 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
 
 
+
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
+
+
+
+
 -correcao
 192.168.1.64 - rig64-mini-e3_1270
 192.168.1.67 - rig67-asus-i5_-3330
