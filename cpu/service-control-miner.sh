@@ -55,7 +55,7 @@ for TARGET_IP in "${TARGET_IPS[@]}"; do
         # Executar outro script
         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
         IP_FOUND=true
-        DEROLUNA_POOL="192.168.1.168:10100"
+        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 
         # Iniciar o minerador Deroluna
         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
