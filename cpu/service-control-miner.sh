@@ -44,7 +44,7 @@ CURRENT_IP=$(hostname -I | awk '{print $1}')
     
 # fi
 
-TARGET_IPS=("192.168.15.161" "192.168.1.149" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
+TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
 
 # Variável para controlar se o IP foi encontrado
 IP_FOUND=false
@@ -55,7 +55,7 @@ for TARGET_IP in "${TARGET_IPS[@]}"; do
         # Executar outro script
         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
         IP_FOUND=true
-        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10300"
 
         # Iniciar o minerador Deroluna
         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
