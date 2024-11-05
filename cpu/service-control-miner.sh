@@ -19,7 +19,7 @@ env >> "$ENV_LOGFILE"
 
 # Variáveis para o Deroluna Miner
 DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
-DEROLUNA_POOL="192.168.1.168:10100"
+DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
 DEROLUNA_THREADS=$(nproc)
 
@@ -55,7 +55,7 @@ for TARGET_IP in "${TARGET_IPS[@]}"; do
         # Executar outro script
         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
         IP_FOUND=true
-        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10300"
+        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 
         # Iniciar o minerador Deroluna
         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
