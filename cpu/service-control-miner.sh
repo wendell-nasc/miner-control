@@ -17,88 +17,68 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
-DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
-DEROLUNA_THREADS=$(nproc)
-
-
-
-#Servico para restartar
+# Servico para restartar
 SERVICO="xdag_gustavo.service"
 
-# Verificar o IP atual
-CURRENT_IP=$(hostname -I | awk '{print $1}')
-#TARGET_IP=["192.168.15.199", "192.168.15.198", "192.168.15.194"]
 
+# TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
 
-# if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-#     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
-#     # Executar outro script
-#     # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+# # Variável para controlar se o IP foi encontrado
+# IP_FOUND=false
 
-#     exit 1
-# else
-#     echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
+# for TARGET_IP in "${TARGET_IPS[@]}"; do
+#     if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+#         # echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
+#         # Executar outro script
+#         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+#         IP_FOUND=true
+#         DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+
+#         # Iniciar o minerador Deroluna
+#         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+#         #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+#         "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
+#         # Esperar os processos em segundo plano
+#         wait
+
+#         echo "Mineradores iniciados."
+
+#         break
+#     fi
+# done
+
+# if [ "$IP_FOUND" == false ]; then
+#     # echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
     
-# fi
+#     # Verificar se o minerador existe, caso contrário, baixar e extrair
+#     if [ ! -f "$DEROLUNA_BINARY" ]; then
+#         echo "Minerador não encontrado. Baixando e extraindo..." >> "$DEROLUNA_LOGFILE"
+#         wget https://github.com/Hansen333/Hansen33-s-DERO-Miner/releases/latest/download/hansen33s-dero-miner-linux-amd64.tar.gz -P /home/wendell/dero_linux_amd64
+#         sudo tar -xvf /home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64.tar.gz -C /home/wendell/dero_linux_amd64
+#         echo "Minerador baixado e extraído." >> "$DEROLUNA_LOGFILE"
+#     else
+#         echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
+#     fi
 
-TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
+# Variáveis para o XMRig
+XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
+XMRIG_POOL="stratum.xdag.org:23655"
+XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
+XMRIG_ALGO="rx/xdag"
+XMRIG_THREADS=$(nproc)
+XMRIG_HTTP_PORT="37329"
+XMRIG_HTTP_TOKEN="auth"
+XMRIG_DONATE_LEVEL="1"
+CONFIG="/opt/xmrig/config.json"
 
-# Variável para controlar se o IP foi encontrado
-IP_FOUND=false
-
-for TARGET_IP in "${TARGET_IPS[@]}"; do
-    if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-        # echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
-        # Executar outro script
-        # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
-        IP_FOUND=true
-        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-
-        # Iniciar o minerador Deroluna
-        echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-        #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-        "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-
-        # Esperar os processos em segundo plano
-        wait
-
-        echo "Mineradores iniciados."
-
-        break
-    fi
-done
-
-if [ "$IP_FOUND" == false ]; then
-    # echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
-    
-    # Verificar se o minerador existe, caso contrário, baixar e extrair
-    if [ ! -f "$DEROLUNA_BINARY" ]; then
-        echo "Minerador não encontrado. Baixando e extraindo..." >> "$DEROLUNA_LOGFILE"
-        wget https://github.com/Hansen333/Hansen33-s-DERO-Miner/releases/latest/download/hansen33s-dero-miner-linux-amd64.tar.gz -P /home/wendell/dero_linux_amd64
-        sudo tar -xvf /home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64.tar.gz -C /home/wendell/dero_linux_amd64
-        echo "Minerador baixado e extraído." >> "$DEROLUNA_LOGFILE"
-    else
-        echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
-    fi
-
-    # Iniciar o minerador Deroluna
-    echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-    #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-    "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-
-    # Esperar os processos em segundo plano
-    wait
-
-    echo "Mineradores iniciados."
+# Iniciar o minerador XMRig
+echo "Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
+"$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
 
 
-    # sudo chmod +x /home/wendell/hansen/hansen.sh && sudo nano /etc/systemd/system/dero_hansen.service
-    #testeetstets
-fi
+# Esperar os processos em segundo plano
+wait
 
-
-
-
+echo "Mineradores iniciados."
+#testeteststste
