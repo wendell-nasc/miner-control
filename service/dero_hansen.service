@@ -1,11 +1,10 @@
 
-
 [Unit]
 Description=Start XMRig and Deroluna Miners
 After=network.target
 
 [Service]
-ExecStart=/home/wendell/hansen/hansen.sh
+ExecStart=/etc/systemd/system/start-xdag_gustavo.sh
 Restart=always
 #User=wendell  # Descomente e ajuste conforme necessário
 StandardOutput=journal

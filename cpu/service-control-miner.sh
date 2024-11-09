@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Definir arquivos de log
-ASTROMINER="/var/log/start-astrominer.log"
+XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
+DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
 ENV_LOGFILE="/var/log/start-env.log"
-ENV_ERRO="/var/log/astrominer-errors.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$ASTROMINER" "$ENV_LOGFILE" "$ENV_ERRO"; do
+for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -17,50 +17,80 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
+
+# TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
+
+# # Variável para controlar se o IP foi encontrado
+# IP_FOUND=false
+
+# for TARGET_IP in "${TARGET_IPS[@]}"; do
+#     if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+#         # echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
+#         # Executar outro script
+#         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+#         IP_FOUND=true
+#         DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+
+#         # Iniciar o minerador Deroluna
+#         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+#         #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+#         "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
+#         # Esperar os processos em segundo plano
+#         wait
+
+#         echo "Mineradores iniciados."
+
+#         break
+#     fi
+# done
+
+
+
+
+# Variáveis para o XMRig
+XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
+XMRIG_POOL="stratum.xdag.org:23656"
+XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
+XMRIG_ALGO="rx/xdag"
+XMRIG_THREADS=$(nproc)
+XMRIG_HTTP_PORT="37329"
+XMRIG_HTTP_TOKEN="auth"
+XMRIG_DONATE_LEVEL="1"
+CONFIG="/opt/xmrig/config.json"
+
+# Iniciar o minerador XMRig
+echo "Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
+"$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
+# Aguardar um pouco
+sleep 2
+
 # Variáveis para o Deroluna Miner
-ASTROMINER_BINARY="/home/wendell/astrominer/astrominer/astrominer"
-ASTROMINER_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-#ASTROMINER_POOL="192.168.1.168:10100"
-ASTROMINER_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
-ASTROMINER_THREADS=$(nproc)
+DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
 
-
-
-# # Verificar o IP atual
-# CURRENT_IP=$(hostname -I | awk '{print $1}')
-# TARGET_IP="192.168.15.161"
-
-# if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-#     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$ASTROMINER"
-#     # Executar outro script
-#     # /path/to/outro_script.sh >> "$ASTROMINER" 2>> /var/log/start-deroluna-errors.log
-
-#     exit 1
-# else
-#     echo "IP não corresponde. Atual: $CURRENT_IP." >> "$ASTROMINER"
-    
-# fi
-
-
-# Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$ASTROMINER_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$ASTROMINER"
-    mkdir /home/wendell/astrominer && cd /home/wendell/astrominer && sudo wget https://github.com/dero-am/astrobwt-miner/releases/download/V1.9.2.R5/astrominer-V1.9.2.R5_amd64_linux.tar.gz&& sudo tar xvf astrominer-V1.9.2.R5_amd64_linux.tar.gz
-    echo "Minerador baixado e extraído." >> "$ASTROMINER"
+# Definir a variável DEROLUNA_POOL com base na hora atual
+HORA_ATUAL=$(date +%H)
+if [ "$HORA_ATUAL" -ge 0 ] && [ "$HORA_ATUAL" -le 12 ]; then
+    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 else
-    echo "Minerador encontrado. Prosseguindo..." >> "$ASTROMINER"
+    # DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
+    #DEROLUNA_POOL="community-pools.mysrv.cloud:10100"
+    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+    
+    
 fi
 
+DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
+DEROLUNA_THREADS=$(nproc)
+
+
 # Iniciar o minerador Deroluna
-echo "Iniciando Deroluna Miner..." >> "$ASTROMINER"
-"$ASTROMINER_BINARY" -r "$ASTROMINER_POOL" -w "$ASTROMINER_WALLET" -m "$ASTROMINER_THREADS" -k -1 >> "$ASTROMINER" 2>> "$ENV_ERRO" &
+echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+"$DEROLUNA_BINARY" --xmrig -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
 
 # Esperar os processos em segundo plano
 wait
 
 echo "Mineradores iniciados."
-
-
-# sudo chmod +x /home/wendell/hansen/hansen.sh && sudo nano /etc/systemd/system/dero_hansen.service
-#testeetstets
-
+#testeteststste
