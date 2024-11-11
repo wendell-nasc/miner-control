@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Definir arquivos de log
-SCASH_LOGFILE="/var/log/scash.log"
+XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
+DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
 ENV_LOGFILE="/var/log/start-env.log"
-SCASH_ERRO="/var/log/start-scash-errors.log" # Corrigido espaço incorreto
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$SCASH_LOGFILE" "$ENV_LOGFILE" "$SCASH_ERRO"; do
+for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -17,35 +17,67 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o minerador scash
-SCASH_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
-SCASH_POOL="51pool.online:3416"
-# SCASH_POOL="192.168.1.168:10100" # Outra opção de pool comentada
-SCASH_WALLET="wendell"
-SCASH_THREADS=$(nproc)
-SCASH_ALGORITIMO="randomepic"
-SCASH_PW="Duda654321"
+
+# TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
+
+# # Variável para controlar se o IP foi encontrado
+# IP_FOUND=false
+
+# for TARGET_IP in "${TARGET_IPS[@]}"; do
+#     if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+#         # echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
+#         # Executar outro script
+#         # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+#         IP_FOUND=true
+#         DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+
+#         # Iniciar o minerador Deroluna
+#         echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+#         #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+#         "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
+#         # Esperar os processos em segundo plano
+#         wait
+
+#         echo "Mineradores iniciados."
+
+#         break
+#     fi
+# done
 
 
-# Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$SCASH_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$SCASH_LOGFILE"
-    sudo mkdir -p /home/wendell/SRBMiner
-    cd /home/wendell/SRBMiner || exit
-    sudo wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
-    sleep 20
-    sudo tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz
-    sleep 20
-    echo "Minerador baixado e extraído." >> "$SCASH_LOGFILE"
-else
-    echo "Minerador encontrado. Prosseguindo..." >> "$SCASH_LOGFILE"
-fi
 
-# Iniciar o minerador scash
-echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE" 
-"$SCASH_BINARY" --disable-gpu --algorithm "$SCASH_ALGORITIMO" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET#$(hostname)" --password "$SCASH_PW" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true >> "$SCASH_LOGFILE" 2>> "$SCASH_ERRO" &
+
+# Variáveis para o XMRig
+XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
+XMRIG_POOL="stratum.xdag.org:23656"
+XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
+XMRIG_ALGO="rx/xdag"
+XMRIG_THREADS=$(nproc)
+XMRIG_HTTP_PORT="37329"
+XMRIG_HTTP_TOKEN="auth"
+XMRIG_DONATE_LEVEL="1"
+CONFIG="/opt/xmrig/config.json"
+
+# Iniciar o minerador XMRig
+echo "Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
+"$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
+# Aguardar um pouco
+sleep 2
+
+# Variáveis para o Deroluna Miner
+DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
+DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
+DEROLUNA_THREADS=$(nproc)
+
+
+# Iniciar o minerador Deroluna
+echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+"$DEROLUNA_BINARY" --xmrig -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
 
 # Esperar os processos em segundo plano
 wait
 
-echo "Mineradores iniciados com sucesso."
+echo "Mineradores iniciados."
+#testeteststste
