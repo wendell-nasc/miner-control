@@ -24,6 +24,8 @@ SCASH_POOL="51pool.online:3416"
 SCASH_WALLET="wendell"
 SCASH_THREADS=$(nproc)
 SCASH_ALGORITIMO="randomepic"
+SCASH_PW="Duda654321"
+
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
 if [ ! -f "$SCASH_BINARY" ]; then
@@ -41,7 +43,7 @@ fi
 
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE" 
-"$SCASH_BINARY" --disable-gpu --algorithm "$SCASH_ALGORITIMO" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET#$(hostname)" --password "1234" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true >> "$SCASH_LOGFILE" 2>> "$SCASH_ERRO" &
+"$SCASH_BINARY" --disable-gpu --algorithm "$SCASH_ALGORITIMO" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET#$(hostname)" --password "$SCASH_PW" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true >> "$SCASH_LOGFILE" 2>> "$SCASH_ERRO" &
 
 # Esperar os processos em segundo plano
 wait
