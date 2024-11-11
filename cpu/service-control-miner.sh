@@ -59,7 +59,7 @@ fi
 
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
-"$SCASH_BINARY" --disable-gpu --algorithm "$SCASH_ALGORITIMO" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET#$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true &
+"$SCASH_BINARY" --disable-gpu --algorithm "$SCASH_ALGORITIMO" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET#$(hostname)" --password "1234" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true &
 #"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
 #./SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool eu.rplant.xyz:7019 --wallet "scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)"  --donate-level 1 --cpu-threads
 
