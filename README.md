@@ -1,3 +1,11 @@
+# PENDENTES RIGS
+161
+165
+
+159
+
+
+
 # …or create a new repository on the command line
 echo "# miner-control" >> README.md
 git init
@@ -16,7 +24,8 @@ git push -u origin main
 
 # geral
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
-sudo chmod 777 /etc/systemd/system/start-xdag_gustavo.sh
+
+sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 
 # CONTROL
 
@@ -29,7 +38,7 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 
 
 
-sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
 
@@ -39,7 +48,7 @@ sudo tail -f /var/log/start-astrominer.log
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 sudo chmod 777 /etc/systemd/system/start-xdag_gustavo.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
-
+sudo systemctl status xdag_gustavo.service
 
 -correcao
 192.168.1.64 - rig64-mini-e3_1270
@@ -89,6 +98,8 @@ sudo systemctl status xdag_gustavo.service
 sudo tail -f /var/log/control_miner.log
 sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
 sudo tail -f /var/log/start-deroluna-hansen.log
+
+
 
 
 
