@@ -27,7 +27,7 @@ XMRIG_THREADS=$(nproc) # Define o número de threads baseado no número de CPUs 
 XMRIG_HTTP_PORT="37329"
 XMRIG_HTTP_TOKEN="auth"
 XMRIG_DONATE_LEVEL="1" # Definir nível de doação para 1%
-CONFIG="/opt/xmrig/config.json"
+CONFIG='"http": { "enabled": true, "host": "127.0.0.1", "port": 37329, "access-token": "auth", "restricted": false }"'
 
 # Iniciar o minerador XMRig com as configurações específicas
 echo "Iniciando XMRig Miner..." >> $XMRIG_LOGFILE

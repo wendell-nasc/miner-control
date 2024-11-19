@@ -1,46 +1,61 @@
 #!/bin/bash
 
-# URL do arquivo no GitHub
+# URL dos arquivos no GitHub
 URL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/cpu/service-control-miner.sh"
 URL_CONTROL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/control/service-control.sh"
 
-# Caminho do arquivo local
+# Caminho dos arquivos locais
 ARQUIVO_LOCAL="/etc/systemd/system/start-xdag_gustavo.sh"
 ARQUIVO_LOCAL_CONTROL="/opt/service-control.sh"
 
-
-# Definir arquivos de log
+# Definir arquivo de log
 LOGFILE="/var/log/control_miner.log"
 
-#Servico para restartar
+# Serviço para reiniciar
 SERVICO="xdag_gustavo.service"
 
-
-# Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$LOGFILE"; do
-    touch "$logfile"
-    chmod 644 "$logfile"
-done
+# Garantir que o arquivo de log exista e tenha permissões adequadas
+touch "$LOGFILE"
+chmod 644 "$LOGFILE"
 
 # Atualizar data e hora para o horário do Brasil
 echo "$(date): Atualizando a data e hora para o horário do Brasil..." >> $LOGFILE
 sudo timedatectl set-timezone America/Sao_Paulo
 
+# Função para atualizar um arquivo se necessário
+atualizar_arquivo() {
+    local url=$1
+    local arquivo_local=$2
 
+    # Baixar o arquivo temporário
+    local temp_file=$(mktemp)
+    if curl -s "$url" -o "$temp_file"; then
+        if ! diff -q --strip-trailing-cr "$temp_file" "$arquivo_local" > /dev/null; then
+            echo "$(date): Arquivo diferente. Atualizando $arquivo_local..." >> $LOGFILE
+            mv "$temp_file" "$arquivo_local"
+            chmod 777 "$arquivo_local"
+            echo "$(date): Arquivo atualizado: $arquivo_local" >> $LOGFILE
+            return 1
+        else
+            echo "$(date): O arquivo $arquivo_local já está atualizado." >> $LOGFILE
+            rm "$temp_file"
+        fi
+    else
+        echo "$(date): Falha ao baixar $url." >> $LOGFILE
+        rm "$temp_file"
+        return 0
+    fi
+}
 
-# Comparar e atualizar automaticamente
-if ! curl -s $URL | diff -q --strip-trailing-cr $ARQUIVO_LOCAL - > /dev/null; then
-    echo "$(date): Arquivo diferente. Atualizando..." >> $LOGFILE
-    # Baixar e substituir o arquivo local
-    sudo rm -r $ARQUIVO_LOCAL && sudo curl -s $URL -o $ARQUIVO_LOCAL && sudo chmod 777 $ARQUIVO_LOCAL
-    sudo rm -r $ARQUIVO_LOCAL_CONTROL && sudo curl -s $URL_CONTROL -o $ARQUIVO_LOCAL_CONTROL && sudo chmod 777 $ARQUIVO_LOCAL_CONTROL
+# Atualizar os arquivos se necessário
+atualizar_arquivo "$URL" "$ARQUIVO_LOCAL"
+atualizar_arquivo "$URL_CONTROL" "$ARQUIVO_LOCAL_CONTROL"
 
-    
-    echo "$(date): Arquivo atualizado !!!" >> $LOGFILE
-    # Reiniciar o serviço
-    echo "$(date): Reiniciando o servico ..." >> $LOGFILE
-    sudo systemctl daemon-reload && sudo systemctl stop $SERVICO && sudo systemctl restart $SERVICO 
-    echo "$(date): Servico reiniciado !!!" >> $LOGFILE
+# Reiniciar o serviço somente se algum arquivo foi atualizado
+if [ $? -eq 1 ]; then
+    echo "$(date): Reiniciando o serviço $SERVICO..." >> $LOGFILE
+    sudo systemctl daemon-reload && sudo systemctl stop "$SERVICO" && sudo systemctl restart "$SERVICO"
+    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
 else
-    echo "$(date): O arquivo já está atualizado." >> $LOGFILE
+    echo "$(date): Nenhuma atualização foi feita. Serviço não reiniciado." >> $LOGFILE
 fi
