@@ -31,7 +31,8 @@ CONFIG="/opt/xmrig/config.json"
 
 # Iniciar o minerador XMRig com as configurações específicas
 echo "Iniciando XMRig Miner..." >> $XMRIG_LOGFILE
-$XMRIG_BINARY -o $XMRIG_POOL -u $XMRIG_USER -t $XMRIG_THREADS --algo=$XMRIG_ALGO  --donate-level=$XMRIG_DONATE_LEVEL --config=$CONFIG >> $XMRIG_LOGFILE 2>&1 &
+"$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+
 
 
 # Aguardar um pouco
