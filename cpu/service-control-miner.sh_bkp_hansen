@@ -25,23 +25,23 @@ DEROLUNA_THREADS=$(nproc)
 
 
 
-#Servico para restartar
-SERVICO="xdag_gustavo.service"
+# #Servico para restartar
+# SERVICO="xdag_gustavo.service"
 
-# Verificar o IP atual
-CURRENT_IP=$(hostname -I | awk '{print $1}')
-TARGET_IP="192.168.15.161"
+# # Verificar o IP atual
+# CURRENT_IP=$(hostname -I | awk '{print $1}')
+# TARGET_IP="192.168.15.161"
 
-if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-    echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
-    # Executar outro script
-    # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
+# if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+#     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
+#     # Executar outro script
+#     # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
 
-    exit 1
-else
-    echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
+#     exit 1
+# else
+#     echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
     
-fi
+# fi
 
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
