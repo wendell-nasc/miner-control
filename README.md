@@ -27,10 +27,17 @@ sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 
 sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 
+
+
 # CONTROL
 
-sudo nano /opt/service-control.sh
-sudo sh /opt/service-control.sh
+sudo rm -r /opt/service-control.sh && sudo nano /opt/service-control.sh
+sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh
+
+
+
+
+
 
 sudo touch /var/log/control_miner.log && sudo nano /opt/service-control.sh
 sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
