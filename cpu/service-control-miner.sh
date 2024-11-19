@@ -72,12 +72,13 @@ DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
 # Definir a variável DEROLUNA_POOL com base na hora atual
 HORA_ATUAL=$(date +%H)
 if [ "$HORA_ATUAL" -ge 0 ] && [ "$HORA_ATUAL" -le 12 ]; then
-    #DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-    DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
+    
+    #DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
+    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 else
-    DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
+    #DEROLUNA_POOL="derosolo.bernacripto.com.br:10100"
     #DEROLUNA_POOL="community-pools.mysrv.cloud:10100"
-    # DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
 
     
     
