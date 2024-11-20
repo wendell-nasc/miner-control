@@ -49,7 +49,7 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 
 
 
-sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl enable xdag_gustavo.service && sudo systemctl start xdag_gustavo.service
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
 

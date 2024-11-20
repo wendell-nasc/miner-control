@@ -34,33 +34,13 @@ XMRIG_CONFIG="/opt/xmrig/config.json"
 # Criar ou atualizar o arquivo de configuração do XMRig
 cat > "$XMRIG_CONFIG" <<EOL
 {
-    "autosave": true,
-    "cpu": {
-        "enabled": true,
-        "huge-pages": true,
-        "hw-aes": true,
-        "priority": 5,
-        "memory-pool": true,
-        "asm": true,
-        "1gb-pages": true,
-        "max-threads-hint": 100
-    },
     "http": {
-        "enabled": true,
-        "host": "127.0.0.1",
-        "port": $XMRIG_HTTP_PORT,
-        "access-token": "$XMRIG_HTTP_TOKEN",
-        "restricted": false
-    },
-    "pools": [
-        {
-            "url": "$XMRIG_POOL",
-            "user": "$XMRIG_USER",
-            "pass": "x",
-            "keepalive": true,
-            "tls": false
-        }
-    ]
+    "enabled": true,
+    "host": "127.0.0.1",
+    "port": 37329,
+    "access-token": "auth",
+    "restricted": false
+}
 }
 EOL
 
@@ -70,7 +50,7 @@ chmod 644 "$XMRIG_CONFIG"
 # Validar a existência do binário XMRig
 if [ -x "$XMRIG_BINARY" ]; then
     echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
-    "$XMRIG_BINARY" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
 else
     echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
 fi
