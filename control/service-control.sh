@@ -17,6 +17,7 @@ SERVICO="xdag_gustavo.service"
 # Garantir que o arquivo de log exista e tenha permissões adequadas
 touch "$LOGFILE"
 chmod 644 "$LOGFILE"
+chmod +x "$ARQUIVO_LOCAL_CONTROL"
 
 # Atualizar data e hora para o horário do Brasil
 echo "$(date): Atualizando a data e hora para o horário do Brasil..." >> $LOGFILE
@@ -54,7 +55,9 @@ atualizar_arquivo "$URL_CONTROL" "$ARQUIVO_LOCAL_CONTROL"
 # Reiniciar o serviço somente se algum arquivo foi atualizado
 if [ $? -eq 1 ]; then
     echo "$(date): Reiniciando o serviço $SERVICO..." >> $LOGFILE
-    sudo systemctl stop "$SERVICO" && sudo systemctl daemon-reload && sudo systemctl start "$SERVICO"
+    sudo systemctl stop "$SERVICO" &    
+    sudo systemctl daemon-reload &
+    sudo systemctl restart "$SERVICO" &
     echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
 else
     echo "$(date): Nenhuma atualização foi feita. Serviço não reiniciado." >> $LOGFILE
