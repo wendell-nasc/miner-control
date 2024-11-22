@@ -20,28 +20,51 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
+
 # Variáveis para o XMRig
-XMRIG_BINARY="/opt/xmrig/xmrig"
-XMRIG_POOL="randomx.rplant.xyz:7020"
-XMRIG_USER="amyKgyh7fnCXbfugdhpoQ7AGeQKTGc3bDQRU5h63cq6SVTzHP8or5GPbYzaVoP2AQi2Ngdx8KHutfV2K1sRJTrQg9jaVSZkfPy.$(hostname)"
-XMRIG_ALGO="randomx"
-XMRIG_THREADS=$(nproc) # Número de threads baseado nas CPUs disponíveis
+XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
+XMRIG_POOL="stratum.xdag.org:23656"
+XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
+XMRIG_ALGO="rx/xdag"
+XMRIG_THREADS=$(nproc)
 XMRIG_HTTP_PORT="37329"
 XMRIG_HTTP_TOKEN="auth"
-XMRIG_DONATE_LEVEL="1" # Nível de doação
-XMRIG_CONFIG="/opt/xmrig/config.json"
+XMRIG_DONATE_LEVEL="1"
+CONFIG="/opt/xmrig/config.json"
+
+
 
 # Criar ou atualizar o arquivo de configuração do XMRig
 cat > "$XMRIG_CONFIG" <<EOL
+
+
 {
+    "autosave": true,
+    "cpu": {
+        "enabled": true,
+        "huge-pages": true,                // Ativa o uso de páginas grandes para melhor desempenho
+        "hw-aes": true,                    // Ativa HW AES, se suportado pelo seu processador (melhora o desempenho em algoritmos que o utilizam)
+        "priority": 5,                     // Aumenta a prioridade do minerador (0 a 10, onde 10 é a mais alta)
+        "memory-pool": true,               // Ativa o pool de memória para melhorar a eficiência
+        "max-threads-hint": 100,           // Ajuste baseado no número de threads disponíveis
+        "asm": true,                       // Ativa as instruções ASM para melhor desempenho
+        "argon2-impl": null,               // Deixe como null a menos que você tenha uma implementação específica
+        "astrobwt-max-size": 550,          // Tamanho máximo do Astrobwt, mantenha ou ajuste conforme necessário
+        "astrobwt-avx2": true,             // Habilite AVX2 se seu CPU suportar, para melhorar o desempenho no Astrobwt
+        "cn/0": false,                     // Normalmente não é necessário ativar
+        "cn-lite/0": false,                // Normalmente não é necessário ativar
+        "1gb-pages": true                   // Ativa suporte a 1GB de páginas, se suportado pelo seu sistema
+    },
     "http": {
-    "enabled": true,
-    "host": "127.0.0.1",
-    "port": 37329,
-    "access-token": "auth",
-    "restricted": false
+        "enabled": true,
+        "host": "127.0.0.1",
+        "port": 37329,
+        "access-token": "auth",
+        "restricted": false
+    }
 }
-}
+
+
 EOL
 
 # Garantir que o arquivo de configuração tenha permissões adequadas
