@@ -59,7 +59,7 @@ fi
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
 #"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true --cpu-threads-intensity 4 --disable-huge-pages false --cpu-threads-priority 5 
-nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --keepalive true --cpu-threads 0 --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
+nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --keepalive true --cpu-threads "$SCASH_THREADS" --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
 
 
 #"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
