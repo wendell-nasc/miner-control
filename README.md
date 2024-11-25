@@ -36,7 +36,14 @@ sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo
 
 
 
+sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service 
 
+
+-- SCASH
+sudo systemctl stop xdag_gustavo.service
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo systemctl daemon-reload && sudo systemctl start xdag_gustavo.service
+sudo tail -f /var/log/scash.log
 
 
 sudo touch /var/log/control_miner.log && sudo nano /opt/service-control.sh
