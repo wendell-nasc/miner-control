@@ -36,7 +36,7 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$SCASH_LOGFILE"
     # Executar outro script
     # /path/to/outro_script.sh >> "$SCASH_LOGFILE" 2>> /var/log/start-scash-errors.log
-    "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)"  --cpu-threads 2 --keepalive true &
+    "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true &
     
     wait
 
@@ -63,13 +63,12 @@ fi
 
 # Iniciar o minerador scash
 echo "Iniciando scash Miner..." >> "$SCASH_LOGFILE"
-#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)"  --cpu-threads "$SCASH_THREADS" --keepalive true --cpu-threads-intensity 4 --disable-huge-pages false --cpu-threads-priority 5 
-#nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)"  --keepalive true --cpu-threads "$SCASH_THREADS" --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
-nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)"  --keepalive true --cpu-threads "$SCASH_THREADS" --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
+#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --keepalive true --cpu-threads-intensity 4 --disable-huge-pages false --cpu-threads-priority 5 
+nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --keepalive true --cpu-threads "$SCASH_THREADS" --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
 
 
-#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)"  --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
-#./SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool eu.rplant.xyz:7019 --wallet "scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)"   --cpu-threads
+#"$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --donate-level 1 --cpu-threads "$SCASH_THREADS" --password m=solo --keepalive true &
+#./SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool eu.rplant.xyz:7019 --wallet "scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)"  --donate-level 1 --cpu-threads
 
 
 # Esperar os processos em segundo plano
@@ -83,8 +82,7 @@ echo "Mineradores iniciados."
 
 
 
-# sudo screen -S scash_rplant /home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --disable-gpu --algorithm randomscash --pool stratum-na.rplant.xyz:7019 --wallet scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.rig167_note_samsung  --keepalive true
-# sudo screen -S scash_rplant /home/wendell/srb/srbminer_custom/srbminer_custom_bin --disable-gpu --algorithm randomscash --pool stratum-na.rplant.xyz:7019 --wallet scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u.$(hostname)  --keepalive true --cpu-threads $(nproc) --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5
+
 
 
 
