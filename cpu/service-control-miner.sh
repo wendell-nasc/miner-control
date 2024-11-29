@@ -92,7 +92,7 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     
     # Iniciar o minerador SRBMiner
     nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $THREADS_SRBMINER --keepalive true --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
-    sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
+    sleep 40  # Esperar um pouco antes de iniciar o minerador XMRig
 
     # Iniciar o minerador XMRig
     nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
@@ -103,7 +103,7 @@ else
     
     # Iniciar o minerador SRBMiner
     nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $THREADS_SRBMINER --keepalive true --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
-    sleep 5  # Esperar um pouco antes de iniciar o minerador SRBMiner
+    sleep 40  # Esperar um pouco antes de iniciar o minerador SRBMiner
 
     # Iniciar o minerador XMRig
     nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
