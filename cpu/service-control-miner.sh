@@ -30,7 +30,7 @@ SERVICO="xdag_gustavo.service"
 
 # Verificar o IP atual
 CURRENT_IP=$(hostname -I | awk '{print $1}')
-TARGET_IP="192.168.1.167"
+TARGET_IP="192.168.1.199"
 
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$SCASH_LOGFILE"
