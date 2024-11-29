@@ -58,14 +58,14 @@ sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/S
 
 
 sudo systemctl daemon-reload && sudo systemctl enable xdag_gustavo.service && sudo systemctl start xdag_gustavo.service
-sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
 
 
 sudo tail -f /var/log/start-astrominer.log
 
 
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
-sudo chmod 777 /etc/systemd/system/start-xdag_gustavo.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+sudo chmod 777 /etc/systemd/system/start-xdag_gustavo.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
 
 sudo systemctl status xdag_gustavo.service
 
