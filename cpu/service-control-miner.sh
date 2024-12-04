@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Definir arquivos de log
-SCASH_LOGFILE="/var/log/scash.log"
+
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
+SCASH_LOGFILE="/var/log/scash.log"
 ENV_LOGFILE="/var/log/start-env.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
@@ -48,16 +49,7 @@ for ((i = THREADS_SRBMINER + 1; i <= TOTAL_THREADS; i++)); do
 done
 
 echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$SCASH_LOGFILE"
-echo "Índices do XMRig: [$THREADS_XMRIG_INDEXES]" >> "$XMRIG_LOGFILE"
 
-# Variáveis para o XMRig
-XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
-XMRIG_POOL="stratum.xdag.org:23656"
-XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
-XMRIG_ALGO="rx/xdag"
-XMRIG_HTTP_PORT="37329"
-XMRIG_HTTP_TOKEN="auth"
-XMRIG_DONATE_LEVEL="1"
 
 # Variáveis para o minerador scash
 SCASH_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
@@ -91,23 +83,26 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$SCASH_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $THREADS_SRBMINER --keepalive true --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
-    sleep 40  # Esperar um pouco antes de iniciar o minerador XMRig
-
-    # Iniciar o minerador XMRig
-    nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    
+    sudo systemctl stop "$SERVICO" &    
+    sudo systemctl daemon-reload &
+    sudo systemctl restart "$SERVICO" &
+    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
+    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --password m=solo --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
     # Caso o IP não corresponda, só executa o minerador XMRig
     echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$SCASH_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $THREADS_SRBMINER --keepalive true --randomx-use-1gb-pages --disable-numa-binding --cpu-threads-priority 5 &
-    sleep 40  # Esperar um pouco antes de iniciar o minerador SRBMiner
-
-    # Iniciar o minerador XMRig
-    nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-
+    
+    sudo systemctl stop "$SERVICO" &    
+    sudo systemctl daemon-reload &
+    sudo systemctl restart "$SERVICO" &
+    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
+    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --password m=solo --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    sleep 5
     
 
 fi
