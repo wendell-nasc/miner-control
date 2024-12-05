@@ -88,7 +88,7 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     sudo systemctl daemon-reload &
     sudo systemctl restart "$SERVICO" &
     echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --password m=solo --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
@@ -101,7 +101,7 @@ else
     sudo systemctl daemon-reload &
     sudo systemctl restart "$SERVICO" &
     echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --password m=solo --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5
     
 
