@@ -26,11 +26,23 @@ XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
 XMRIG_POOL="stratum.xdag.org:23656"
 XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
 XMRIG_ALGO="rx/xdag"
-XMRIG_THREADS=$(nproc)
 XMRIG_HTTP_PORT="37329"
 XMRIG_HTTP_TOKEN="auth"
 XMRIG_DONATE_LEVEL="1"
-CONFIG="/opt/xmrig/config.json"
+XMRIG_CONFIG="/opt/xmrig/config.json"
+THREADS_XMRIG=$(nproc)
+
+
+
+
+# Variáveis para o Deroluna Miner
+DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
+DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
+DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
+DEROLUNA_THREADS=$(nproc)
+
+
+
 
 
 
@@ -70,38 +82,82 @@ EOL
 # Garantir que o arquivo de configuração tenha permissões adequadas
 chmod 644 "$XMRIG_CONFIG"
 
-# Validar a existência do binário XMRig
-if [ -x "$XMRIG_BINARY" ]; then
-    echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
-    "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
+
+
+
+
+
+
+
+# Verificar o IP atual
+CURRENT_IP=$(hostname -I | awk '{print $1}')
+TARGET_IP="192.168.1.199"
+
+
+# Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
+if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$SCASH_LOGFILE"
+    
+
+    # Validar a existência do binário XMRig
+    if [ -x "$XMRIG_BINARY" ]; then
+        echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
+        nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    else
+        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
+    fi
+
+
+    # Aguardar um pouco
+    sleep 10
+
+
+
+    # Validar a existência do binário Deroluna
+    if [ -x "$DEROLUNA_BINARY" ]; then
+        echo "$(date): Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+        nice -n -20 "$DEROLUNA_BINARY" --xmrig -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    else
+        echo "$(date): ERRO: Binário Deroluna não encontrado ou sem permissões em $DEROLUNA_BINARY" >> "$ERROR_LOGFILE"
+    fi
+
+    
+    
+
 else
-    echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
+    # Caso o IP não corresponda, só executa o minerador XMRig
+    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$SCASH_LOGFILE"
+    
+        # Validar a existência do binário XMRig
+    if [ -x "$XMRIG_BINARY" ]; then
+        echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
+        nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t $THREADS_XMRIG --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    else
+        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
+    fi
+
+
+    # Aguardar um pouco
+    sleep 10
+
+    # Validar a existência do binário Deroluna
+    if [ -x "$DEROLUNA_BINARY" ]; then
+        echo "$(date): Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
+        nice -n -20 "$DEROLUNA_BINARY" --xmrig -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    else
+        echo "$(date): ERRO: Binário Deroluna não encontrado ou sem permissões em $DEROLUNA_BINARY" >> "$ERROR_LOGFILE"
+    fi
+
+    
+
+    
+
 fi
 
-# Aguardar um pouco
-sleep 2
 
-# Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
 
-# Definir a variável DEROLUNA_POOL com base na hora atual
-HORA_ATUAL=$(date +%H)
-if [ "$HORA_ATUAL" -ge 0 ] && [ "$HORA_ATUAL" -le 12 ]; then
-    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-else
-    DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-fi
 
-DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
-DEROLUNA_THREADS=$(nproc)
 
-# Validar a existência do binário Deroluna
-if [ -x "$DEROLUNA_BINARY" ]; then
-    echo "$(date): Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-    "$DEROLUNA_BINARY" --xmrig -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> "$ERROR_LOGFILE" &
-else
-    echo "$(date): ERRO: Binário Deroluna não encontrado ou sem permissões em $DEROLUNA_BINARY" >> "$ERROR_LOGFILE"
-fi
 
 # Esperar os processos em segundo plano
 wait
