@@ -3,11 +3,11 @@
 # Definir arquivos de log
 
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-SCASH_LOGFILE="/var/log/scash.log"
+PEPOW_LOGFILE="/var/log/PEPOW.log"
 ENV_LOGFILE="/var/log/start-env.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$SCASH_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE"; do
+for logfile in "$PEPOW_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -25,7 +25,7 @@ TOTAL_THREADS=$(nproc)
 THREADS_SRBMINER=$(( (TOTAL_THREADS * 2 + 2) / 3 ))  # 2/3 das threads
 THREADS_XMRIG=$((TOTAL_THREADS - THREADS_SRBMINER))  # 1/3 das threads
 
-echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$SCASH_LOGFILE"
+echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$PEPOW_LOGFILE"
 echo "Configurando o XMRig para usar $THREADS_XMRIG threads..." >> "$XMRIG_LOGFILE"
 
 # Variáveis para armazenar os índices das threads
@@ -48,17 +48,19 @@ for ((i = THREADS_SRBMINER + 1; i <= TOTAL_THREADS; i++)); do
     THREADS_XMRIG_INDEXES+="$i"  # Adiciona o índice
 done
 
-echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$SCASH_LOGFILE"
+echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$PEPOW_LOGFILE"
 
 
-# Variáveis para o minerador scash
-SCASH_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
-SCASH_POOL="stratum-na.rplant.xyz:7019"
-SCASH_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+# Variáveis para o minerador PEPOW
+PEPOW_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
+PEPOW_POOL="stratum+tcp://br.mining4people.com:4176"
+PEPOW_WALLET="PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ"
+PEPOW_ALGO="xelishashv2_pepew"
+
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$SCASH_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$SCASH_LOGFILE"
+if [ ! -f "$PEPOW_BINARY" ]; then
+    echo "Minerador não encontrado. Baixando e extraindo..." >> "$PEPOW_LOGFILE"
     
     # Criar diretório e navegar até ele
     mkdir -p /home/wendell/SRBMiner
@@ -67,9 +69,9 @@ if [ ! -f "$SCASH_BINARY" ]; then
     # Baixar e extrair o minerador
     wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao baixar o minerador"; exit 1; }
     tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao extrair o minerador"; exit 1; }
-    echo "Minerador baixado e extraído." >> "$SCASH_LOGFILE"
+    echo "Minerador baixado e extraído." >> "$PEPOW_LOGFILE"
 else
-    echo "Minerador já encontrado. Prosseguindo..." >> "$SCASH_LOGFILE"
+    echo "Minerador já encontrado. Prosseguindo..." >> "$PEPOW_LOGFILE"
 fi
 
 
@@ -80,28 +82,18 @@ TARGET_IP="192.168.1.199"
 
 # Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$SCASH_LOGFILE"
+    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    
-    sudo systemctl stop "$SERVICO" &    
-    sudo systemctl daemon-reload &
-    sudo systemctl restart "$SERVICO" &
-    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
     # Caso o IP não corresponda, só executa o minerador XMRig
-    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$SCASH_LOGFILE"
+    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    
-    sudo systemctl stop "$SERVICO" &    
-    sudo systemctl daemon-reload &
-    sudo systemctl restart "$SERVICO" &
-    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
-    nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5
     
 
