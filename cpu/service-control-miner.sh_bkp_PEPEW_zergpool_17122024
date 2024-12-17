@@ -15,7 +15,7 @@ done
 # Exportar o PATH para garantir o ambiente adequado
 export PATH="$PATH"
 
-# Log das variáveis de ambiente
+# Log das variáveis zergpoolde ambiente
 env >> "$ENV_LOGFILE"
 
 # Função para calcular o número total de threads da CPU
@@ -85,8 +85,7 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 -p c=PEPEW,mc=PEPEW,ID="$(hostname)"
- >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password PEPEW --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
@@ -94,8 +93,7 @@ else
     echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET"  --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 -p c=PEPEW,mc=PEPEW,ID="$(hostname)"
- >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password PEPEW --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5
     
 
@@ -107,5 +105,3 @@ wait
 
 # Mensagem final
 echo "$(date): Mineradores iniciados com sucesso."
-
-#https://zergpool.com/wallet/PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ
