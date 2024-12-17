@@ -113,3 +113,5 @@ wait
 
 # Mensagem final
 echo "$(date): Mineradores iniciados com sucesso."
+
+#teststesteststs
