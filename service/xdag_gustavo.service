@@ -1,0 +1,35 @@
+#sudo nano /etc/systemd/system/xdag_gustavo.service
+#/etc/systemd/system/start-xdag_gustavo.sh
+#sudo journalctl -f -u  xdag_gustavo.service
+
+
+[Unit]
+
+Description=Start XMRig Miner
+
+After=network.target
+
+
+[Service]
+
+ExecStart=/etc/systemd/system/start-xdag_gustavo.sh
+
+Restart=always
+
+#User=wendell
+
+StandardOutput=syslog
+
+StandardError=syslog
+
+SyslogIdentifier=xmrig
+
+Nice=10
+
+LimitNOFILE=4096
+
+
+[Install]
+
+WantedBy=multi-user.target
+
