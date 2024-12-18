@@ -54,10 +54,10 @@
 
     # Reiniciar o serviço somente se algum arquivo foi atualizado
     if [ $? -eq 1 ]; then
-        echo "$(date): Reiniciando o serviço $SERVICO..." >> $LOGFILE
-        sudo systemctl stop "$SERVICO" &    
+        echo "$(date): Reiniciando o serviço $SERVICO..." >> $LOGFILE        
         sudo systemctl daemon-reload &
-        sudo systemctl restart "$SERVICO" &
+        sudo systemctl stop "$SERVICO" &
+        sudo systemctl start "$SERVICO" &
         echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
     else
         echo "$(date): Nenhuma atualização foi feita. Serviço não reiniciado." >> $LOGFILE
