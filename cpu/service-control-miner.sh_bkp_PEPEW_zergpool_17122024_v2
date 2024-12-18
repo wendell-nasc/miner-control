@@ -53,7 +53,7 @@ echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$PEPOW_LOGFILE"
 
 # Variáveis para o minerador PEPOW
 PEPOW_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
-PEPOW_POOL="stratum+tcp://us.mining4people.com:4176"
+PEPOW_POOL="stratum+tcp://na.mine.zergpool.com:5778"
 PEPOW_WALLET="PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ"
 PEPOW_ALGO="xelishashv2_pepew"
 
@@ -85,7 +85,8 @@ if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 -p c=PEPEW,mc=PEPEW,ID="$(hostname)"
+ >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
@@ -93,7 +94,8 @@ else
     echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$PEPOW_LOGFILE"
     
     # Iniciar o minerador SRBMiner
-    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    nice -n -20 "$PEPOW_BINARY" --disable-gpu --algorithm "$PEPOW_ALGO" --pool "$PEPOW_POOL" --wallet "$PEPOW_WALLET"  --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 -p c=PEPEW,mc=PEPEW,ID="$(hostname)"
+ >> "$PEPOW_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5
     
 
@@ -105,3 +107,5 @@ wait
 
 # Mensagem final
 echo "$(date): Mineradores iniciados com sucesso."
+
+#https://zergpool.com/wallet/PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ
