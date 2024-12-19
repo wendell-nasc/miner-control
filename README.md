@@ -32,7 +32,8 @@ sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 # CONTROL
 
 sudo rm -r /opt/service-control.sh && sudo nano /opt/service-control.sh
-sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
+
+sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl start xdag_gustavo.service
 
 
 

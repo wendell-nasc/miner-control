@@ -95,8 +95,8 @@ else
     
     # Iniciar o minerador SRBMiner
     
-    
-    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $LOGFILE
+
+    echo "$(date): Serviço $SERVICO reiniciado com sucesso!" >> $SCASH_LOGFILE
     nice -n -20 "$SCASH_BINARY" --disable-gpu --algorithm randomscash --pool "$SCASH_POOL" --wallet "$SCASH_WALLET.$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$SCASH_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5
     
