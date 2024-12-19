@@ -26,8 +26,13 @@ git push -u origin main
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 
 sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
-
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+# CRONTAB
+sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
+0 */4 * * * systemctl restart xdag_gustavo.service
+*/2 * * * * /opt/service-control.sh
+30 11 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
+30 23 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
 
 # CONTROL
 
@@ -57,11 +62,8 @@ sudo tail -f /var/log/scash.log
 
 
 sudo touch /var/log/control_miner.log && sudo nano /opt/service-control.sh
-sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
-0 */4 * * * systemctl restart xdag_gustavo.service
-*/2 * * * * /opt/service-control.sh
-30 11 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
-30 23 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
+
+
 
 
 

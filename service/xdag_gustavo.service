@@ -1,6 +1,6 @@
 #sudo nano /etc/systemd/system/xdag_gustavo.service
 #/etc/systemd/system/start-xdag_gustavo.sh
-#sudo journalctl -f -u  xdag_gustavo.service
+sudo journalctl -f -u  xdag_gustavo.service
 
 
 [Unit]
