@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Verificar se o 'screen' está instalado. Se não, instalar sem interação
+# Verificar se o screen está instalado. Se não, instalar sem interação
 if ! command -v screen &> /dev/null; then
     echo "O 'screen' não está instalado. Instalando agora..."
     sudo apt-get update -y && sudo apt-get install -y screen
@@ -38,20 +38,13 @@ if [ ! -f "$VERUSCOIN_BINARY" ]; then
     echo "Minerador não encontrado. Baixando e extraindo..." >> "$VERUSCOIN_LOGFILE"
     
     # Criar diretório e navegar até ele
-    cd /home/wendell || { echo "Falha ao acessar o diretório"; exit 1; }
+    cd /home/wendell || { echo "Falha ao acessar o diretório"; exit 1; }    
 
     # Baixar e extrair o minerador
     git clone https://github.com/vrscms/hellminer.git
     sudo chmod -R 777 hellminer     
     cd /home/wendell/hellminer
-
-    # Rodar o script de instalação, se necessário
-    if [ -f "./install.sh" ]; then
-        ./install.sh
-    else
-        echo "O script de instalação não foi encontrado. Verifique a instalação manualmente." >> "$VERUSCOIN_LOGFILE"
-    fi
-
+    ./install.sh    
     echo "Minerador baixado e extraído." >> "$VERUSCOIN_LOGFILE"
 else
     cd /home/wendell/hellminer
