@@ -80,7 +80,7 @@ fi
 
 # Aguardar um pouco
 sleep 2
-
+#teste
 # Variáveis para o Deroluna Miner
 DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
 
