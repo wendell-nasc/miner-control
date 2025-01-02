@@ -30,7 +30,7 @@ TOTAL_THREADS=$(nproc)
 
 # Variáveis para o minerador VERUSCOIN
 VERUSCOIN_BINARY="/home/wendell/hellminer/hellminer"
-VERUSCOIN_POOL="stratum+tcp://na.luckpool.net:3956"
+VERUSCOIN_POOL="stratum+tcp://sa.vipor.net:5040"
 VERUSCOIN_WALLET="RAECnH4f6LFXcPYjcNT6dcgwHSvTxM44pW"
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
@@ -64,34 +64,54 @@ TARGET_IP="192.168.1.199"
 
 # Verificar se o minerador já está rodando no screen
 SCREEN_NAME="hellminer"
-SCREEN_CHECK=$(screen -list | grep "$SCREEN_NAME")
+SCREEN_CHECK=$(screen -list | grep -w "$SCREEN_NAME")
 
 # Se o IP corresponder ao alvo, executa o minerador VERUSCOIN
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
     echo "IP corresponde a $TARGET_IP. Executando minerador VERUSCOIN..." >> "$VERUSCOIN_LOGFILE"
 
-    # Verificar se o minerador já está em execução no screen
-    if [ -z "$SCREEN_CHECK" ]; then
-        # Iniciar o minerador VERUSCOIN dentro de uma sessão screen
-        screen -S "$SCREEN_NAME" -d -m "$VERUSCOIN_BINARY" -c "$VERUSCOIN_POOL" -u "$VERUSCOIN_WALLET.$(hostname)" -p x --cpu "$TOTAL_THREADS" >> "$VERUSCOIN_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-        echo "Minerador VERUSCOIN iniciado dentro de uma sessão screen." >> "$VERUSCOIN_LOGFILE"
-    else
-        echo "O minerador já está rodando na sessão screen." >> "$VERUSCOIN_LOGFILE"
+    # Verificar se o minerador já está rodando em alguma sessão screen
+    # Buscando por qualquer sessão com o processo 'hellminer'
+    SCREEN_PID=$(screen -ls | grep -oP '\d+\.\K[^\s]+' | while read session_id; do
+        screen -S "$session_id" -Q select | grep -q "hellminer" && echo "$session_id"
+    done)
+
+    if [ -n "$SCREEN_PID" ]; then
+        # Se encontrar uma sessão com o processo 'hellminer', finalize a sessão
+        echo "Sessão de screen com 'hellminer' encontrada. Finalizando..." >> "$VERUSCOIN_LOGFILE"
+        for pid in $SCREEN_PID; do
+            screen -S "$pid" -X quit
+            echo "Sessão '$pid' finalizada." >> "$VERUSCOIN_LOGFILE"
+        done
     fi
+
+    # Iniciar o minerador VERUSCOIN dentro de uma nova sessão screen
+    screen -S "$SCREEN_NAME" -d -m "$VERUSCOIN_BINARY" -c "$VERUSCOIN_POOL" -u "$VERUSCOIN_WALLET.$(hostname)" -p x --cpu "$TOTAL_THREADS" >> "$VERUSCOIN_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    echo "Minerador VERUSCOIN iniciado dentro de uma nova sessão screen." >> "$VERUSCOIN_LOGFILE"
 
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
     echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador VERUSCOIN..." >> "$VERUSCOIN_LOGFILE"
 
-    # Verificar se o minerador já está em execução no screen
-    if [ -z "$SCREEN_CHECK" ]; then
-        # Iniciar o minerador VERUSCOIN dentro de uma sessão screen
-        screen -S "$SCREEN_NAME" -d -m "$VERUSCOIN_BINARY" -c "$VERUSCOIN_POOL" -u "$VERUSCOIN_WALLET.$(hostname)" -p x --cpu "$TOTAL_THREADS" >> "$VERUSCOIN_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-        echo "Minerador VERUSCOIN iniciado dentro de uma sessão screen." >> "$VERUSCOIN_LOGFILE"
-    else
-        echo "O minerador já está rodando na sessão screen." >> "$VERUSCOIN_LOGFILE"
+    # Verificar se o minerador já está rodando em alguma sessão screen
+    # Buscando por qualquer sessão com o processo 'hellminer'
+    SCREEN_PID=$(screen -ls | grep -oP '\d+\.\K[^\s]+' | while read session_id; do
+        screen -S "$session_id" -Q select | grep -q "hellminer" && echo "$session_id"
+    done)
+
+    if [ -n "$SCREEN_PID" ]; then
+        # Se encontrar uma sessão com o processo 'hellminer', finalize a sessão
+        echo "Sessão de screen com 'hellminer' encontrada. Finalizando..." >> "$VERUSCOIN_LOGFILE"
+        for pid in $SCREEN_PID; do
+            screen -S "$pid" -X quit
+            echo "Sessão '$pid' finalizada." >> "$VERUSCOIN_LOGFILE"
+        done
     fi
+
+    # Iniciar o minerador VERUSCOIN dentro de uma nova sessão screen
+    screen -S "$SCREEN_NAME" -d -m "$VERUSCOIN_BINARY" -c "$VERUSCOIN_POOL" -u "$VERUSCOIN_WALLET.$(hostname)" -p x --cpu "$TOTAL_THREADS" >> "$VERUSCOIN_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    echo "Minerador VERUSCOIN iniciado dentro de uma nova sessão screen." >> "$VERUSCOIN_LOGFILE"
 
     sleep 5
 fi
