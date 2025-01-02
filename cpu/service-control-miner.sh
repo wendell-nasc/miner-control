@@ -30,7 +30,7 @@ TOTAL_THREADS=$(nproc)
 
 # Variáveis para o minerador VERUSCOIN
 VERUSCOIN_BINARY="/home/wendell/hellminer/hellminer"
-VERUSCOIN_POOL="stratum+tcp://eu.luckpool.net:3956#xnsub"
+VERUSCOIN_POOL="stratum+tcp://na.luckpool.net:3956"
 VERUSCOIN_WALLET="RAECnH4f6LFXcPYjcNT6dcgwHSvTxM44pW"
 
 # Verificar se o minerador existe, caso contrário, baixar e extrair
