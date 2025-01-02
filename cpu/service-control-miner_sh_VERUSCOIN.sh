@@ -44,6 +44,7 @@ if [ ! -f "$VERUSCOIN_BINARY" ]; then
     git clone https://github.com/vrscms/hellminer.git
     sudo chmod -R 777 hellminer     
     cd /home/wendell/hellminer
+    ./install.sh    
     echo "Minerador baixado e extraído." >> "$VERUSCOIN_LOGFILE"
 else
     cd /home/wendell/hellminer
