@@ -24,10 +24,16 @@ git push -u origin main
 
 # geral
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo nano /etc/systemd/system/xdag_gustavo.service
 
 sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 
+sudo EDITOR=nano crontab -e
+systemctl restart xdag_gustavo.service
 
+
+
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
 # CONTROL
 
@@ -46,6 +52,11 @@ sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
 sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service 
 
 
+sudo systemctl status xdag_gustavo.service
+
+
+
+
 -- SCASH
 sudo systemctl stop xdag_gustavo.service
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
@@ -57,6 +68,8 @@ sudo tail -f /var/log/scash.log
 
 sudo touch /var/log/control_miner.log && sudo nano /opt/service-control.sh
 sudo chmod +x /opt/service-control.sh && sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
+
+
 0 */4 * * * systemctl restart xdag_gustavo.service
 */2 * * * * /opt/service-control.sh
 30 11 * * * /usr/bin/timedatectl set-timezone America/Sao_Paulo
@@ -133,3 +146,36 @@ sudo tail -f /var/log/start-deroluna-hansen.log
 sudo journalctl -f -u  xdag_gustavo.service
 
 cat /var/log/scash.log
+
+
+
+- HIVE DISABLE
+
+systemctl list-unit-files --type=service | grep enabled
+systemctl list-units --type=service --all
+
+sudo nano /etc/systemd/system/xdag_gustavo.service
+
+sudo systemctl disable hive-console.service && sudo systemctl disable hive-netpre.service &&  sudo systemctl disable hive-ttyd.service && sudo systemctl disable hive-watchdog.service && sudo systemctl disable hive.service hivex.service
+
+
+# VERUSCOIN
+
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo nano /etc/systemd/system/xdag_gustavo.service
+
+sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
+
+
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
+sudo chmod +x /etc/systemd/system/xdag_gustavo.service
+
+
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+sudo tail -f  /var/log/VERUSCOIN.log
+sudo journalctl -f -u  xdag_gustavo.service
+sudo systemctl status xdag_gustavo.service
+
+sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service
+

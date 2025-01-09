@@ -102,3 +102,16 @@ screen -S deroluna-miner /home/wendell/dero_linux_amd64/deroluna-miner -d 192.16
 
 # VERIFICAR CONEXAO
 sudo screen -S dero-node-integrator /home/wendell/dNodedata/dero_linux_amd64/derod-linux-amd64 
+
+
+
+
+- HIVE DISABLE
+
+systemctl list-unit-files --type=service | grep enabled
+systemctl list-units --type=service --all
+
+
+sudo systemctl disable hive-console.service && sudo systemctl disable hive-netpre.service &&  sudo systemctl disable hive-ttyd.service && sudo systemctl disable hive-watchdog.service && sudo systemctl disable hive.service hivex.service
+
+sudo tail -f  /var/log/VERUSCOIN.log

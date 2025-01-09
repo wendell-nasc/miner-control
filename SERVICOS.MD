@@ -1,4 +1,6 @@
 
+sudo nano /etc/systemd/system/xdag_gustavo.service
+
 [Unit]
 Description=Start XMRig and Deroluna Miners
 After=network.target
