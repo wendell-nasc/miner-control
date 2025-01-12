@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Definir arquivos de log
+
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-SALVIUM_LOGFILE="/var/log/SALVIUM.log"
+VERUS_LOGFILE="/var/log/VERUS.log"
 ENV_LOGFILE="/var/log/start-env.log"
-ERROR_LOGFILE="/var/log/error.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$SALVIUM_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+for logfile in "$VERUS_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -25,7 +25,7 @@ TOTAL_THREADS=$(nproc)
 THREADS_SRBMINER=$(( (TOTAL_THREADS * 2 + 2) / 3 ))  # 2/3 das threads
 THREADS_XMRIG=$((TOTAL_THREADS - THREADS_SRBMINER))  # 1/3 das threads
 
-echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$SALVIUM_LOGFILE"
+echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$VERUS_LOGFILE"
 echo "Configurando o XMRig para usar $THREADS_XMRIG threads..." >> "$XMRIG_LOGFILE"
 
 # Variáveis para armazenar os índices das threads
@@ -48,132 +48,57 @@ for ((i = THREADS_SRBMINER + 1; i <= TOTAL_THREADS; i++)); do
     THREADS_XMRIG_INDEXES+="$i"  # Adiciona o índice
 done
 
-echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$SALVIUM_LOGFILE"
-
-# Variáveis para o XMRig
-XMRIG_BINARY="/opt/xmrig/xmrig"
-XMRIG_POOL="br.salvium.herominers.com:1230"
-XMRIG_USER="SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv.$(hostname)"
-XMRIG_ALGO="randomx"
-# XMRIG_THREADS="$THREADS_XMRIG"  # Número de threads baseado no cálculo acima
-XMRIG_THREADS=$(nproc)  # Número de threads baseado no cálculo acima
-XMRIG_HTTP_PORT="37329"
-XMRIG_HTTP_TOKEN="auth"
-XMRIG_DONATE_LEVEL="1" # Nível de doação
-XMRIG_CONFIG="/opt/xmrig/config.json"
-
-# # Criar ou atualizar o arquivo de configuração do XMRig
-# cat > "$XMRIG_CONFIG" <<EOL
-# {
-#     "http": {
-#     "enabled": true,
-#     "host": "127.0.0.1",
-#     "port": 37329,
-#     "access-token": "auth",
-#     "restricted": false
-# }
-# }
-# EOL
+echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$VERUS_LOGFILE"
 
 
-cat > "$XMRIG_CONFIG" <<EOL
+# Variáveis para o minerador VERUS
+VERUS_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
+VERUS_POOL="stratum+tcp://sa.vipor.net:5045"
+VERUS_WALLET="RAECnH4f6LFXcPYjcNT6dcgwHSvTxM44pW"
+VERUS_ALGO="verushash"
 
 
-{
-    "autosave": true,
-    "cpu": {
-        "enabled": true,
-        "huge-pages": true,                // Ativa o uso de páginas grandes para melhor desempenho
-        "hw-aes": true,                    // Ativa HW AES, se suportado pelo seu processador (melhora o desempenho em algoritmos que o utilizam)
-        "priority": 5,                     // Aumenta a prioridade do minerador (0 a 10, onde 10 é a mais alta)
-        "memory-pool": true,               // Ativa o pool de memória para melhorar a eficiência
-        "max-threads-hint": 100,           // Ajuste baseado no número de threads disponíveis
-        "asm": true,                       // Ativa as instruções ASM para melhor desempenho
-        "argon2-impl": null,               // Deixe como null a menos que você tenha uma implementação específica
-        "astrobwt-max-size": 550,          // Tamanho máximo do Astrobwt, mantenha ou ajuste conforme necessário
-        "astrobwt-avx2": true,             // Habilite AVX2 se seu CPU suportar, para melhorar o desempenho no Astrobwt
-        "cn/0": false,                     // Normalmente não é necessário ativar
-        "cn-lite/0": false,                // Normalmente não é necessário ativar
-        "1gb-pages": true                   // Ativa suporte a 1GB de páginas, se suportado pelo seu sistema
-    },
-    "http": {
-        "enabled": true,
-        "host": "127.0.0.1",
-        "port": 37329,
-        "access-token": "auth",
-        "restricted": false
-    }
-}
+# Verificar se o minerador existe, caso contrário, baixar e extrair
+if [ ! -f "$VERUS_BINARY" ]; then
+    echo "Minerador não encontrado. Baixando e extraindo..." >> "$VERUS_LOGFILE"
+    
+    # Criar diretório e navegar até ele
+    mkdir -p /home/wendell/SRBMiner
+    cd /home/wendell/SRBMiner || { echo "Falha ao acessar o diretório"; exit 1; }
 
-
-EOL
-
-
-# Garantir que o arquivo de configuração tenha permissões adequadas
-chmod 644 "$XMRIG_CONFIG"
-
-
-
-# # Validar a existência do binário XMRig
-# if [ -x "$XMRIG_BINARY" ]; then
-#     echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
-#     "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
-# else
-#     echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
-# fi
-
-
-# Variáveis para o minerador SALVIUM
-SALVIUM_BINARY="/opt/xmrig/xmrig"
-SALVIUM_POOL="br.salvium.herominers.com:1230"
-SALVIUM_WALLET="solo:SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv"
-SALVIUM_ALGO="randomx"
-SALVIUM_DONATE_LEVEL="1" # Nível de doação
-
+    # Baixar e extrair o minerador
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao baixar o minerador"; exit 1; }
+    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao extrair o minerador"; exit 1; }
+    echo "Minerador baixado e extraído." >> "$VERUS_LOGFILE"
+else
+    echo "Minerador já encontrado. Prosseguindo..." >> "$VERUS_LOGFILE"
+fi
 
 
 # Verificar o IP atual
 CURRENT_IP=$(hostname -I | awk '{print $1}')
 TARGET_IP="192.168.1.199"
 
+
 # Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$SALVIUM_LOGFILE"
+    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$VERUS_LOGFILE"
     
-    # Validar a existência do binário XMRig
-    if [ -x "$SALVIUM_BINARY" ]; then
-        echo "$(date): Iniciando XMRig Miner..." >> "$SALVIUM_LOGFILE"
-        nice -n -20 "$SALVIUM_BINARY" -o "$SALVIUM_POOL" -u "$SALVIUM_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$SALVIUM_ALGO" --donate-level="$SALVIUM_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$SALVIUM_LOGFILE" 2>> "$ERROR_LOGFILE" &
-        # nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
-
-    else
-        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $SALVIUM_BINARY" >> "$ERROR_LOGFILE"
-    fi
-
+    # Iniciar o minerador SRBMiner
+    nice -n -20 "$VERUS_BINARY" --disable-gpu --algorithm "$VERUS_ALGO" --pool "$VERUS_POOL" --wallet "$VERUS_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$VERUS_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
     # Caso o IP não corresponda, só executa o minerador XMRig
-    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$SALVIUM_LOGFILE"
+    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$VERUS_LOGFILE"
     
-    # Validar a existência do binário XMRig
-    if [ -x "$SALVIUM_BINARY" ]; then
-        echo "$(date): Iniciando XMRig Miner..." >> "$SALVIUM_LOGFILE"
-        nice -n -20 "$SALVIUM_BINARY" -o "$SALVIUM_POOL" -u "$SALVIUM_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$SALVIUM_ALGO" --donate-level="$SALVIUM_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$SALVIUM_LOGFILE" 2>> "$ERROR_LOGFILE" &
-        # nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
-    else
-        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $SALVIUM_BINARY" >> "$ERROR_LOGFILE"
-    fi
+    # Iniciar o minerador SRBMiner
+    nice -n -20 "$VERUS_BINARY" --disable-gpu --algorithm "$VERUS_ALGO" --pool "$VERUS_POOL" --wallet "$VERUS_WALLET.$(hostname)" --password x --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$VERUS_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    
+    sleep 5
+    
 
-    sleep 5 # Esperar um pouco antes de iniciar o minerador XMRig
 fi
-
-
-
-
-
-
-
 
 
 # Esperar os processos em segundo plano
