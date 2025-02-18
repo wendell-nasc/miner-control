@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # Definir arquivos de log
+
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
+QRL_LOGFILE="/var/log/QRL.log"
 ENV_LOGFILE="/var/log/start-env.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
+for logfile in "$QRL_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -17,58 +18,91 @@ export PATH="$PATH"
 # Log das variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/deroluna-miner"
-DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
-DEROLUNA_THREADS=$(nproc)
+# Função para calcular o número total de threads da CPU
+TOTAL_THREADS=$(nproc)
 
+# Divisão de threads com arredondamento correto para números ímpares
+THREADS_SRBMINER=$(( (TOTAL_THREADS * 2 + 2) / 3 ))  # 2/3 das threads
+THREADS_XMRIG=$((TOTAL_THREADS - THREADS_SRBMINER))  # 1/3 das threads
+
+echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$QRL_LOGFILE"
+echo "Configurando o XMRig para usar $THREADS_XMRIG threads..." >> "$XMRIG_LOGFILE"
+
+# Variáveis para armazenar os índices das threads
+THREADS_XMRIG_INDEXES=""
+THREADS_SRBMINER_INDEXES=""
+
+# Preencher os índices das threads para o SRBMiner (2/3 das threads)
+for ((i = 1; i <= THREADS_SRBMINER; i++)); do
+    if [ $i -gt 1 ]; then
+        THREADS_SRBMINER_INDEXES+=";"  # Adiciona ponto e vírgula para separar os valores
+    fi
+    THREADS_SRBMINER_INDEXES+="$i"  # Adiciona o índice
+done
+
+# Preencher os índices das threads para o XMRig (1/3 das threads)
+for ((i = THREADS_SRBMINER + 1; i <= TOTAL_THREADS; i++)); do
+    if [ $i -gt $((THREADS_SRBMINER + 1)) ]; then
+        THREADS_XMRIG_INDEXES+=";"  # Adiciona ponto e vírgula para separar os valores
+    fi
+    THREADS_XMRIG_INDEXES+="$i"  # Adiciona o índice
+done
+
+echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$QRL_LOGFILE"
+
+
+# Variáveis para o minerador QRL
+QRL_BINARY="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
+QRL_POOL="br.qrl.herominers.com:1166"
+QRL_WALLET="Q0105004c5fde633090f2cfa0dcd301547b8a6a39429f56c5a01705cc9359def9aee34fcdc9d18e"
+QRL_ALGO="randomx"
+
+
+# Verificar se o minerador existe, caso contrário, baixar e extrair
+if [ ! -f "$QRL_BINARY" ]; then
+    echo "Minerador não encontrado. Baixando e extraindo..." >> "$QRL_LOGFILE"
+    
+    # Criar diretório e navegar até ele
+    mkdir -p /home/wendell/SRBMiner
+    cd /home/wendell/SRBMiner || { echo "Falha ao acessar o diretório"; exit 1; }
+
+    # Baixar e extrair o minerador
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao baixar o minerador"; exit 1; }
+    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz || { echo "Falha ao extrair o minerador"; exit 1; }
+    echo "Minerador baixado e extraído." >> "$QRL_LOGFILE"
+else
+    echo "Minerador já encontrado. Prosseguindo..." >> "$QRL_LOGFILE"
+fi
 
 
 # Verificar o IP atual
 CURRENT_IP=$(hostname -I | awk '{print $1}')
+TARGET_IP="192.168.1.199"
 
-TARGET_IPS=("192.168.15.161" "192.168.1.148" "192.168.1.151" "192.168.1.154" "192.168.1.158" "192.168.1.162")
 
-# Variável para controlar se o IP foi encontrado
-IP_FOUND=false
-
-for TARGET_IP in "${TARGET_IPS[@]}"; do
-    if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-        # echo "IP corresponde a $TARGET_IP. Executando outro script..." >> "$DEROLUNA_LOGFILE"
-        # Executar outro script
-        # /path/to/outro_script.sh >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log
-        IP_FOUND=true
-        DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-
-        # Iniciar o minerador Deroluna
-        echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-        #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-        "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-
-        # Esperar os processos em segundo plano
-        wait
-
-        echo "Mineradores iniciados."
-
-        break
-    fi
-done
-
-if [ "$IP_FOUND" == false ]; then
-    # echo "IP não corresponde. Atual: $CURRENT_IP." >> "$DEROLUNA_LOGFILE"
+# Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
+if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$QRL_LOGFILE"
     
+    # Iniciar o minerador SRBMiner
+    nice -n -20 "$QRL_BINARY" --disable-gpu --algorithm "$QRL_ALGO" --pool "$QRL_POOL" --wallet "$QRL_WALLET" --password "$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$QRL_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
+
+else
+    # Caso o IP não corresponda, só executa o minerador XMRig
+    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$QRL_LOGFILE"
     
-
-    # Iniciar o minerador Deroluna
-    echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-    #"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-    "$DEROLUNA_BINARY" -d "$DEROLUNA_POOL" -w "$DEROLUNA_WALLET" -t "$DEROLUNA_THREADS" >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
-
-    # Esperar os processos em segundo plano
-    wait
-
-    echo "Mineradores iniciados."
-
+    # Iniciar o minerador SRBMiner
+    nice -n -20 "$QRL_BINARY" --disable-gpu --algorithm "$QRL_ALGO" --pool "$QRL_POOL" --wallet "$QRL_WALLET" --password "$(hostname)" --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 & >> "$QRL_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+    
+    sleep 5
+    
 
 fi
+
+
+# Esperar os processos em segundo plano
+wait
+
+# Mensagem final
+echo "$(date): Mineradores iniciados com sucesso."
