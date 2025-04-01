@@ -184,3 +184,6 @@ sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo
 sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service  && sudo systemctl start xdag_gustavo.service
 
 sudo EDITOR=nano crontab -e
+
+
+sudo tail -f /var/log/start-deroluna-errors.log
