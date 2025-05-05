@@ -106,6 +106,8 @@ sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
 sudo tail -f /var/log/scash.log
 
 
+NICEHASH_LOGFILE
+
 sudo journalctl -f -u  xdag_gustavo.service
 sudo systemctl stop deroluna.service
 
@@ -156,7 +158,11 @@ systemctl list-units --type=service --all
 
 sudo nano /etc/systemd/system/xdag_gustavo.service
 
-sudo systemctl disable hive-console.service && sudo systemctl disable hive-netpre.service &&  sudo systemctl disable hive-ttyd.service && sudo systemctl disable hive-watchdog.service && sudo systemctl disable hive.service hivex.service
+sudo systemctl disable hive-console.service
+sudo systemctl disable hive-netpre.service
+sudo systemctl disable hive-ttyd.service 
+sudo systemctl disable hive-watchdog.service
+sudo systemctl disable hive.service hivex.service
 
 
 # VERUSCOIN
