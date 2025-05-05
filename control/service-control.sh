@@ -1,10 +1,5 @@
 
 #!/bin/bash
-
-
-# sudo nano /opt/service-control.sh
-#sudo chmod +x /opt/service-control.sh
-
 # URL dos arquivos no GitHub
 URL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/cpu/service-control-miner.sh"
 URL_CONTROL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/control/service-control.sh"
