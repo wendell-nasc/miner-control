@@ -1,3 +1,44 @@
+# sSERVICOS DERO APURAR ...
+systemctl list-units --type=service
+sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
+
+
+Caminho dos arquivos locais
+
+
+
+sudo nano /opt/service-control.sh
+
+
+sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+
+
+
+# REDE UBUNTU
+sudo apt update
+sudo apt install nmap
+nmap -sn 192.168.1.0/24
+
+nmap -sn 192.168.1.0/24 | grep "Nmap scan report" | awk '{print $5}' | less
+
+192.168.1.64
+192.168.1.65
+192.168.1.71
+192.168.1.72
+192.168.1.78
+192.168.1.83
+192.168.1.147
+192.168.1.150
+192.168.1.152
+192.168.1.156
+192.168.1.157
+192.168.1.158
+192.168.1.159
+192.168.1.163
+192.168.1.164
+192.168.1.168
+
+
 # PENDENTES RIGS
 161
 165
