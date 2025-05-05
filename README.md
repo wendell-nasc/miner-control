@@ -13,6 +13,32 @@ sudo nano /opt/service-control.sh
 sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
 
+# NOVO SCRIPT
+
+sudo nano /opt/atualizar_script_control_e_miner.sh 
+
+sudo chmod +x /opt/atualizar_script_control_e_miner.sh && sudo /opt/atualizar_script_control_e_miner.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+
+
+
+
+(crontab -l 2>/dev/null; echo "*/2 * * * * /opt/service-atualizar_script_control_e_miner.sh") | crontab -
+
+
+sudo EDITOR=nano crontab -e
+*/2 * * * * /opt/service-atualizar_script_control_e_miner.sh
+
+
+
+
+
+
+
+
+
+
+
+
 
 # REDE UBUNTU
 sudo apt update
