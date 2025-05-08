@@ -128,7 +128,7 @@ chmod 644 "$XMRIG_CONFIG"
 ZEPH_BINARY="/opt/xmrig/xmrig"
 ZEPH_POOL="br.zephyr.herominers.com:1123"
 ZEPH_WALLET="ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c"
-ZEPH_ALGO="randomx"
+ZEPH_ALGO="rx/0"
 ZEPH_DONATE_LEVEL="1" # Nível de doação
 
 
