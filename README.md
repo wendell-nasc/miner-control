@@ -21,14 +21,15 @@ sudo chmod +x /opt/atualizar_script_control_e_miner.sh && sudo /opt/atualizar_sc
 
 
 
-
-(crontab -l 2>/dev/null; echo "*/2 * * * * /opt/service-atualizar_script_control_e_miner.sh") | crontab -
-
-
 sudo EDITOR=nano crontab -e
 */2 * * * * /opt/service-atualizar_script_control_e_miner.sh
 
-
+192.168.1.64
+192.168.1.65
+192.168.1.71 - nao
+192.168.1.72
+192.168.1.78
+192.168.1.83
 
 
 
@@ -47,10 +48,17 @@ nmap -sn 192.168.1.0/24
 
 nmap -sn 192.168.1.0/24 | grep "Nmap scan report" | awk '{print $5}' | less
 
+
+no comando abaixo nao esta aparecendo o ip 192.168.1.77 corrija:
+
+nmap -sn 192.168.1.0/24 | grep "Nmap scan report" | awk '{print $5}' | less
+
+
 192.168.1.64
 192.168.1.65
 192.168.1.71
 192.168.1.72
+192.168.1.77
 192.168.1.78
 192.168.1.83
 192.168.1.147
@@ -63,13 +71,6 @@ nmap -sn 192.168.1.0/24 | grep "Nmap scan report" | awk '{print $5}' | less
 192.168.1.163
 192.168.1.164
 192.168.1.168
-
-
-# PENDENTES RIGS
-161
-165
-
-159
 
 
 

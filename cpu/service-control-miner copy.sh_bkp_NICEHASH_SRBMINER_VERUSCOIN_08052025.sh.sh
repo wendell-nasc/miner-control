@@ -1,14 +1,13 @@
 #!/bin/bash
 
-#/opt/xmrig/xmrig --donate-level 1 -o br.zephyr.herominers.com:1123 -u ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c.YOUR_WORKER_NAME -a rx/0 -k 
 # Definir arquivos de log
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-ZEPH_LOGFILE="/var/log/SALVIUM.log"
+NICE_LOGFILE="/var/log/NICE.log"
 ENV_LOGFILE="/var/log/start-env.log"
 ERROR_LOGFILE="/var/log/error.log"
 
 # Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$ZEPH_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+for logfile in "$NICE_LOGFILE" "$XMRIG_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -26,7 +25,7 @@ TOTAL_THREADS=$(nproc)
 THREADS_SRBMINER=$(( (TOTAL_THREADS * 2 + 2) / 3 ))  # 2/3 das threads
 THREADS_XMRIG=$((TOTAL_THREADS - THREADS_SRBMINER))  # 1/3 das threads
 
-echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$ZEPH_LOGFILE"
+echo "Configurando o SRBMiner para usar $THREADS_SRBMINER threads..." >> "$NICE_LOGFILE"
 echo "Configurando o XMRig para usar $THREADS_XMRIG threads..." >> "$XMRIG_LOGFILE"
 
 # Variáveis para armazenar os índices das threads
@@ -49,12 +48,12 @@ for ((i = THREADS_SRBMINER + 1; i <= TOTAL_THREADS; i++)); do
     THREADS_XMRIG_INDEXES+="$i"  # Adiciona o índice
 done
 
-echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$ZEPH_LOGFILE"
+echo "Índices do SRBMiner: [$THREADS_SRBMINER_INDEXES]" >> "$NICE_LOGFILE"
 
 # Variáveis para o XMRig
 XMRIG_BINARY="/opt/xmrig/xmrig"
-XMRIG_POOL="br.salvium.herominers.com:1230"
-XMRIG_USER="SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv.$(hostname)"
+XMRIG_POOL="stratum+tcp://randomxmonero.auto.nicehash.com:9200"
+XMRIG_USER="NHbQdkTWYaaCs85LgLChnktWpG9bxKnMU72s"
 XMRIG_ALGO="randomx"
 # XMRIG_THREADS="$THREADS_XMRIG"  # Número de threads baseado no cálculo acima
 XMRIG_THREADS=$(nproc)  # Número de threads baseado no cálculo acima
@@ -124,12 +123,12 @@ chmod 644 "$XMRIG_CONFIG"
 # fi
 
 
-# Variáveis para o minerador SALVIUM
-ZEPH_BINARY="/opt/xmrig/xmrig"
-ZEPH_POOL="br.zephyr.herominers.com:1123"
-ZEPH_WALLET="ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c"
-ZEPH_ALGO="randomx"
-ZEPH_DONATE_LEVEL="1" # Nível de doação
+# Variáveis para o minerador NICE
+NICE_BINARY="/opt/xmrig/xmrig"
+NICE_POOL="stratum+tcp://randomxmonero.auto.nicehash.com:9200"
+NICE_WALLET="NHbQdkTWYaaCs85LgLChnktWpG9bxKnMU72s"
+NICE_ALGO="randomx"
+NICE_DONATE_LEVEL="1" # Nível de doação
 
 
 
@@ -139,31 +138,31 @@ TARGET_IP="192.168.1.199"
 
 # Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
 if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
-    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$ZEPH_LOGFILE"
+    echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$NICE_LOGFILE"
     
     # Validar a existência do binário XMRig
-    if [ -x "$ZEPH_BINARY" ]; then
-        echo "$(date): Iniciando XMRig Miner..." >> "$ZEPH_LOGFILE"
-        nice -n -20 "$ZEPH_BINARY" -o "$ZEPH_POOL" -u "$ZEPH_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$ZEPH_ALGO" --donate-level="$ZEPH_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$ZEPH_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    if [ -x "$NICE_BINARY" ]; then
+        echo "$(date): Iniciando XMRig Miner..." >> "$NICE_LOGFILE"
+        nice -n -20 "$NICE_BINARY" -o "$NICE_POOL" -u "$NICE_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$NICE_ALGO" --donate-level="$NICE_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$NICE_LOGFILE" 2>> "$ERROR_LOGFILE" &
         # nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
     else
-        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $ZEPH_BINARY" >> "$ERROR_LOGFILE"
+        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $NICE_BINARY" >> "$ERROR_LOGFILE"
     fi
 
     sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
 
 else
     # Caso o IP não corresponda, só executa o minerador XMRig
-    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$ZEPH_LOGFILE"
+    echo "IP não corresponde. IP atual: $CURRENT_IP. Executando apenas o minerador XMRig..." >> "$NICE_LOGFILE"
     
     # Validar a existência do binário XMRig
-    if [ -x "$ZEPH_BINARY" ]; then
-        echo "$(date): Iniciando XMRig Miner..." >> "$ZEPH_LOGFILE"
-        nice -n -20 "$ZEPH_BINARY" -o "$ZEPH_POOL" -u "$ZEPH_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$ZEPH_ALGO" --donate-level="$ZEPH_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$ZEPH_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    if [ -x "$NICE_BINARY" ]; then
+        echo "$(date): Iniciando XMRig Miner..." >> "$NICE_LOGFILE"
+        nice -n -20 "$NICE_BINARY" -o "$NICE_POOL" -u "$NICE_WALLET.$(hostname)" -t "$TOTAL_THREADS" --algo="$NICE_ALGO" --donate-level="$NICE_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$NICE_LOGFILE" 2>> "$ERROR_LOGFILE" &
         # nice -n -20 "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$XMRIG_CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
     else
-        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $ZEPH_BINARY" >> "$ERROR_LOGFILE"
+        echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $NICE_BINARY" >> "$ERROR_LOGFILE"
     fi
 
     sleep 5 # Esperar um pouco antes de iniciar o minerador XMRig
