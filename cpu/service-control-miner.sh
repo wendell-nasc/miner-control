@@ -40,18 +40,20 @@ else
     echo "SRBMiner encontrado." >> "$ZEPH_LOGFILE"
 fi
 
-# Executa SRBMiner
-if [ -x "$ZEPH_BINARY1" ]; then
-    echo "$(date): Iniciando SRBMiner..." >> "$ZEPH_LOGFILE"
-    nice -n -20 "$ZEPH_BINARY1" --disable-gpu --algorithm "$ZEPH_ALGO1" \
-        --pool "$ZEPH_POOL" --wallet "$ZEPH_WALLET1.$(hostname)" \
-        --cpu-threads "$THREADS_SRBMINER" --keepalive true \
-        --cpu-threads-priority 5 >> "$ZEPH_LOGFILE" 2>> "$ERROR_LOGFILE" &
-else
-    echo "ERRO: Binário SRBMiner não encontrado." >> "$ERROR_LOGFILE"
-fi
+# # Executa SRBMiner
+# if [ -x "$ZEPH_BINARY1" ]; then
+#     echo "$(date): Iniciando SRBMiner..." >> "$ZEPH_LOGFILE"
+#     # nice -n -20 "$ZEPH_BINARY1" --disable-gpu --algorithm "$ZEPH_ALGO1" \
+#     #     --pool "$ZEPH_POOL" --wallet "$ZEPH_WALLET1.$(hostname)" \
+#     #     --cpu-threads "$THREADS_SRBMINER" --keepalive true \
+#     #     --cpu-threads-priority 5 >> "$ZEPH_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-sleep 5
+#     nice -n -20 "$ZEPH_BINARY1" --disable-gpu --algorithm "$ZEPH_ALGO1" --pool "$ZEPH_POOL" --wallet "$ZEPH_WALLET1.$(hostname)"  --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$ZEPH_LOGFILE" 2>> "$ERROR_LOGFILE" &
+# else
+#     echo "ERRO: Binário SRBMiner não encontrado." >> "$ERROR_LOGFILE"
+# fi
+
+# sleep 5
 
 # Configuração do XMRig
 XMRIG_BINARY="/opt/xmrig/xmrig"
