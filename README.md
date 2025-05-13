@@ -31,8 +31,12 @@ sudo EDITOR=nano crontab -e
 sudo /opt/atualizar_script_control_e_miner.sh
 
 - add as duas linhas:
-* * * * * /opt/atualizar_script_control_e_miner.sh
-* * * * * [ -f /opt/atualizar_script_control_e_miner.sh.new ] && mv /opt/atualizar_script_control_e_miner.sh.new /opt/atualizar_script_control_e_miner.sh
+sudo nano /opt/atualizar_script_control_e_miner.sh
+sudo EDITOR=nano crontab -e
+
+
+*/5 * * * * /opt/atualizar_script_control_e_miner.sh
+*/5 * * * * [ -f /opt/atualizar_script_control_e_miner.sh.new ] && mv /opt/atualizar_script_control_e_miner.sh.new /opt/atualizar_script_control_e_miner.sh
 
 
 
@@ -48,7 +52,13 @@ sudo /opt/atualizar_script_control_e_miner.sh
 
 
 
-
+192.168.1.64
+192.168.1.65
+192.168.1.71
+192.168.1.72
+192.168.1.77
+192.168.1.78
+192.168.1.83
 
 
 

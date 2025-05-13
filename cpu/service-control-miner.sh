@@ -52,7 +52,8 @@ if [ -x "$SCASH_BINARY1" ]; then
     #     --cpu-threads "$THREADS_SRBMINER" --keepalive true \
     #     --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-    nice -n -20 "$SCASH_BINARY1" --disable-gpu --algorithm "$SCASH_ALGO1" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET1.$(hostname)"  --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    #nice -n -20 "$SCASH_BINARY1" --disable-gpu --algorithm "$SCASH_ALGO1" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET1.$(hostname)"  --cpu-threads $TOTAL_THREADS --keepalive true --randomx-use-1gb-pages --cpu-threads-priority 5 >> "$SCASH_LOGFILE" 2>> "$ERROR_LOGFILE" &
+    nice -n -20 "$SCASH_BINARY1" --disable-gpu --algorithm "$SCASH_ALGO1" --pool "$SCASH_POOL" --wallet "$SCASH_WALLET1.$(hostname)"  --keepalive true >> "$SCASH_LOGFILE" 2>> "$ERROR_LOGFILE" &
 else
     echo "ERRO: Binário SRBMiner não encontrado." >> "$ERROR_LOGFILE"
 fi
