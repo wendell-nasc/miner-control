@@ -1,3 +1,5 @@
+<!-- markdownlint-disable -->
+
 # sSERVICOS DERO APURAR ...
 systemctl list-units --type=service
 sudo tail -f /var/log/start-deroluna-xdag_gustavo.log
@@ -23,7 +25,7 @@ sudo chmod +x /opt/atualizar_script_control_e_miner.sh && sudo /opt/atualizar_sc
 
 sudo EDITOR=nano crontab -e
 */30 * * * * /opt/atualizar_script_control_e_miner.sh
-*/1 * * * * /opt/atualizar_script_control_e_miner.sh
+*/5 * * * * /opt/atualizar_script_control_e_miner.sh
 
 192.168.1.64
 192.168.1.65
