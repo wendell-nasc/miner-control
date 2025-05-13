@@ -1,4 +1,7 @@
 #!/bin/bash
+#tstte atu 
+#arquivo
+
 
 # Caminho dos logs
 XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
