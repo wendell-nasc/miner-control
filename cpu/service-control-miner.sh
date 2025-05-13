@@ -1,6 +1,5 @@
 #!/bin/bash
-#tstte atu 
-#arquivo
+#13052025 12>22
 
 
 # Caminho dos logs
