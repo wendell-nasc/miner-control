@@ -1,5 +1,9 @@
 #!/bin/bash
 #13052025 12>22
+#13052025 12>22
+
+#13052025 12>22
+
 # Caminhos dos arquivos locais e URLs dos arquivos no Git
 ARQUIVO_CONTROL_LOCAL="/opt/service-control.sh"
 ARQUIVO_CONTROL_GIT="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/control/service-control.sh"
@@ -45,6 +49,9 @@ verificar_e_atualizar() {
 # Verifica e atualiza os arquivos de controle e miner
 verificar_e_atualizar "$ARQUIVO_CONTROL_LOCAL" "$ARQUIVO_CONTROL_GIT"
 verificar_e_atualizar "$ARQUIVO_MINER_LOCAL" "$ARQUIVO_MINER_GIT"
+verificar_e_atualizar "$ARQUIVO_SCRIPT_LOCAL" "$ARQUIVO_SCRIPT_GIT"
+
+
 
 # Verificação especial: não substituir o script enquanto ele roda
 echo "Verificando atualização do próprio script..."
