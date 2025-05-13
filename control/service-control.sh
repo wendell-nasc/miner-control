@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#teste
 
 # URL dos arquivos no GitHub
 URL="https://raw.githubusercontent.com/wendell-nasc/miner-control/refs/heads/main/cpu/service-control-miner.sh"
