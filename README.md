@@ -22,11 +22,10 @@ sudo chmod +x /opt/atualizar_script_control_e_miner.sh && sudo /opt/atualizar_sc
 
 
 sudo EDITOR=nano crontab -e
-*/2 * * * * /opt/service-atualizar_script_control_e_miner.sh
+*/30 * * * * /opt/service-atualizar_script_control_e_miner.sh
 
 192.168.1.64
 192.168.1.65
-192.168.1.71 - nao
 192.168.1.72
 192.168.1.78
 192.168.1.83
