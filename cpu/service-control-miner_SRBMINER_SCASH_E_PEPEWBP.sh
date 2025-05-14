@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#13052025 12>22
 
 # Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
@@ -41,14 +41,24 @@ MOEDA1_POOL="stratum-na.rplant.xyz:7019"
 MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
 MOEDA1_ALGO="randomscash"
 
+# Segunda moeda (ex: Zephyr)
+MOEDA2_POOL="stratum+tcp://br.mining4people.com:4176"
+MOEDA2_WALLET="PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ"
+MOEDA2_ALGO="xelishashv2_pepew"
 
 # Inicia SRBMiner para moeda 1
 echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
 nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
   --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  --cpu-threads-priority 5 --keepalive true \
+  --cpu-threads "$THREADS1" --cpu-threads-priority 5 --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+
+# Inicia SRBMiner para moeda 2
+echo "$(date): Iniciando mineração da Moeda 2..." >> "$MOEDA2_LOGFILE"
+nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO" \
+  --pool "$MOEDA2_POOL" --wallet "$MOEDA2_WALLET.$(hostname)" \
+  --cpu-threads "$THREADS2" --cpu-threads-priority 5 --keepalive true \
+  >> "$MOEDA2_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
 echo "$(date): Ambos mineradores iniciados com sucesso."
