@@ -38,8 +38,9 @@ fi
 
 # Primeira moeda (ex: SCASH)
 MOEDA1_POOL="br.salvium.herominers.com:1230"
-MOEDA1_WALLET="NHbQdkTWYaaCs85LgLChnktWpG9bxKnMU72s"
+MOEDA1_WALLET="SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv"
 MOEDA1_ALGO="randomx"
+
 
 
 
