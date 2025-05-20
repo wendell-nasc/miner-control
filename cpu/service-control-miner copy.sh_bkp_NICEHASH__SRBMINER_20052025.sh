@@ -37,9 +37,10 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="br.salvium.herominers.com:1230"
+MOEDA1_POOL="stratum+tcp://randomxmonero.auto.nicehash.com:9200"
 MOEDA1_WALLET="NHbQdkTWYaaCs85LgLChnktWpG9bxKnMU72s"
 MOEDA1_ALGO="randomx"
+
 
 
 
