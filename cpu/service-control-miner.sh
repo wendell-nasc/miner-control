@@ -37,7 +37,7 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="br.salvium.herominers.com:1230"
+MOEDA1_POOL="br.salvium.herominers.com:1231"
 MOEDA1_WALLET="SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv"
 MOEDA1_ALGO="randomx"
 
@@ -50,7 +50,7 @@ echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
 nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
   --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
   --cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  --cpu-threads-priority 5 --keepalive true \
+  #--cpu-threads-priority 5 --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
