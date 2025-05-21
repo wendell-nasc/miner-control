@@ -37,12 +37,9 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="br.salvium.herominers.com:1231"
-MOEDA1_WALLET="SaLvdWbthy1hjCMh6SnV6z2trwaNq87gKJ3g2nuGXTiGMv6VAFzvSNzTeV6ncF5nfTMjWTeDNrKY8a5FnFeYResjTymWAFQpnfv"
-MOEDA1_ALGO="randomx"
-
-
-
+MOEDA1_POOL="stratum+tcp://br.mining4people.com:4176"
+MOEDA1_WALLET="PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ"
+MOEDA1_ALGO="xelishashv2_pepew"
 
 
 # Inicia SRBMiner para moeda 1
