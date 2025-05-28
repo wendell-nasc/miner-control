@@ -16,6 +16,7 @@ sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemct
 
 
 # NOVO SCRIPT
+sudo /opt/atualizar_script_control_e_miner.sh
 
 sudo nano /opt/atualizar_script_control_e_miner.sh
 
