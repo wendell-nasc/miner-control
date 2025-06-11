@@ -31,7 +31,7 @@ sudo EDITOR=nano crontab -e
 
 sudo /opt/atualizar_script_control_e_miner.sh
 
-- add as duas linhas:
+- add as duas linhas:t
 sudo nano /opt/atualizar_script_control_e_miner.sh
 sudo EDITOR=nano crontab -e
 

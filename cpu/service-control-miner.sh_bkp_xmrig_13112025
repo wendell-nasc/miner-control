@@ -66,13 +66,13 @@
   }
 EOL
 
-  chmod 644 "$XMRIG_CONFIG"
+chmod 644 "$XMRIG_CONFIG"
 
-  # Inicia SRBMiner para moeda 1
-  echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
-  nice -n -20 "$XMRIG_PATH"  -o "$MOEDA1_POOL" -u "$MOEDA1_WALLET.$(hostname)" \  
-    --algo="$MOEDA1_ALGO" --donate-level=1 --threads="$TOTAL_THREADS" --config="$XMRIG_CONFIG" \
-    >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+# Inicia SRBMiner para moeda 1
+echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
+nice -n -20 "$XMRIG_PATH"  -o "$MOEDA1_POOL" -u "$MOEDA1_WALLET.$(hostname)" \
+  --algo="$MOEDA1_ALGO" --donate-level=1 --threads="$TOTAL_THREADS" --config="$XMRIG_CONFIG" \
+  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-  wait
-  echo "$(date): Ambos mineradores iniciados com sucesso."
+wait
+echo "$(date): Ambos mineradores iniciados com sucesso."
