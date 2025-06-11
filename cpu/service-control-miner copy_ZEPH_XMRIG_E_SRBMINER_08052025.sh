@@ -94,7 +94,7 @@ chmod 644 "$XMRIG_CONFIG"
 if [ -x "$XMRIG_BINARY" ]; then
     echo "$(date): Iniciando XMRig..." >> "$XMRIG_LOGFILE"
     nice -n -20 "$XMRIG_BINARY" -o "$ZEPH_POOL" -u "$ZEPH_WALLET.$(hostname)" \
-        --algo="$ZEPH_ALGO" --donate-level=1 --config="$XMRIG_CONFIG" \
+        --algo="$ZEPH_ALGO" --threads="$TOTAL_THREADS" --donate-level=1 --config="$XMRIG_CONFIG" \
         >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
 else
     echo "ERRO: Binário XMRig não encontrado." >> "$ERROR_LOGFILE"

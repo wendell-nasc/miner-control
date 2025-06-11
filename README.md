@@ -259,6 +259,13 @@ sudo systemctl disable hive-watchdog.service
 sudo systemctl disable hive.service hivex.service
 
 
+
+sudo systemctl stop hive-console.service
+sudo systemctl stop hive-netpre.service
+sudo systemctl stop hive-ttyd.service 
+sudo systemctl stop hive-watchdog.service
+sudo systemctl stop hive.service hivex.service
+
 # VERUSCOIN
 
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
