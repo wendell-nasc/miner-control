@@ -17,6 +17,27 @@ sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemct
 
 # NOVO SCRIPT
 sudo /opt/atualizar_script_control_e_miner.sh
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+
+-asus-fx8120:~$ htop                                                                                                                                                         
+wendell@rig148-asus-fx8120:~$ sh /etc/systemd/system/start-xdag_gustavo.sh                                                                                                                 
+touch: não foi possível tocar '/var/log/SRBMOEDA1.log': Permissão negada                                                                                                                   
+chmod: alterando permissões de '/var/log/SRBMOEDA1.log': Operação não permitida                                                                                                            
+touch: não foi possível tocar '/var/log/SRBMOEDA2.log': Permissão negada                                                                                                                   
+chmod: alterando permissões de '/var/log/SRBMOEDA2.log': Operação não permitida                                                                                                            
+touch: não foi possível tocar '/var/log/start-env.log': Permissão negada                                                                                                                   
+chmod: alterando permissões de '/var/log/start-env.log': Operação não permitida                                                                                                            
+touch: não foi possível tocar '/var/log/error.log': Permissão negada                                                                                                                       
+chmod: alterando permissões de '/var/log/error.log': Operação não permitida                                                                                                                
+/etc/systemd/system/start-xdag_gustavo.sh: 20: cannot create /var/log/start-env.log: Permission denied                                                                                     
+/etc/systemd/system/start-xdag_gustavo.sh: 40: cannot create /opt/xmrig/config.json: Permission denied                                                                                     
+chmod: alterando permissões de '/opt/xmrig/config.json': Operação não permitida                                                                                                            
+/etc/systemd/system/start-xdag_gustavo.sh: 72: cannot create /var/log/SRBMOEDA1.log: Permission denied                                                                                     
+/etc/systemd/system/start-xdag_gustavo.sh: 73: cannot create /var/log/SRBMOEDA1.log: Permission denied                                                                                     
+Thu Jun 12 12:24:37 AM -03 2025: Ambos mineradores iniciados com sucesso.                                                                                                                  
+wendell@rig148-asus-fx8120:~$ sudo sh /etc/systemd/system/start-xdag_gustavo.sh                                                                                                            
+                                                                                                   
+
 
 sudo nano /opt/atualizar_script_control_e_miner.sh
 
