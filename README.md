@@ -44,7 +44,9 @@ sudo nano /opt/atualizar_script_control_e_miner.sh
 sudo chmod +x /opt/atualizar_script_control_e_miner.sh && sudo /opt/atualizar_script_control_e_miner.sh && sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
 
 
+sh /opt/atualizar_script_control_e_miner.sh
 
+ssh wendell@192.168.1.150
 sudo EDITOR=nano crontab -e
 */30 * * * * /opt/atualizar_script_control_e_miner.sh
 
