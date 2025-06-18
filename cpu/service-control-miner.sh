@@ -25,32 +25,53 @@ THREADS1=$((TOTAL_THREADS / 2))
 THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
 # Caminho do binário SRBMiner
-SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
+XMRIG_PATH="/opt/xmrig/xmrig"
 
-# Verifica existência do SRBMiner
-if [ ! -f "$SRB_PATH" ]; then
-    echo "SRBMiner não encontrado. Baixando..." >> "$ERROR_LOGFILE"
-    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
-    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
-    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz
-    echo "SRBMiner baixado com sucesso." >> "$ENV_LOGFILE"
-fi
 
 # Primeira moeda (ex: SCASH)
 MOEDA1_POOL="br.qrl.gfwroute.com:1166"
 MOEDA1_WALLET="Q0105004c5fde633090f2cfa0dcd301547b8a6a39429f56c5a01705cc9359def9aee34fcdc9d18e"
-MOEDA1_ALGO="randomx"
+MOEDA1_ALGO="rx/0"
+XMRIG_CONFIG="/opt/xmrig/config.json"
 
 
 
+# Gera config do XMRig
+cat > "$XMRIG_CONFIG" <<EOL
+{
+    "name": "Tari RandomX pool",
+    "isFavorite": false,
+    "items": [
+        {
+            "coin": "tari",
+            "pool_ssl": false,
+            "wal_id": 10822236,
+            "dpool_ssl": false,
+            "miner": "xmrig-new",
+            "miner_alt": "xmrig",
+            "miner_config": {
+                "cpu": "1",
+                "url": "hatchlings.rxpool.net:5555",
+                "algo": "rx/0",
+                "fork": "xmrig",
+                "pass": "x",
+                "template": "%WAL%.%WORKER_NAME%",
+                "hugepages": "1248",
+                "cpu_config": "\"cpu\": {\n  \"huge-pages\": true,\n  \"hw-aes\": null,\n  \"priority\": null,\n  \"memory-pool\": false,\n  \"asm\": true\n}",
+                "user_config": "\"donate-level\": 1"
+            },
+            "pool_geo": []
+        }
+    ]
+}
+EOL
 
+chmod 644 "$XMRIG_CONFIG"
 
 # Inicia SRBMiner para moeda 1
 echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
-nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
-  --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  --cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  #--cpu-threads-priority 5 --keepalive true \
+nice -n -20 "$XMRIG_PATH"  -o "$MOEDA1_POOL" -u "$MOEDA1_WALLET.$(hostname)" \
+  --algo="$MOEDA1_ALGO" --donate-level=1 --threads="$TOTAL_THREADS"  \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
