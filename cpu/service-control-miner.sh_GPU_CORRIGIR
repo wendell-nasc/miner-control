@@ -4,6 +4,7 @@
 # Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
 MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+MOEDA_GPU="/var/log/SRBMOEDAGPU.log"
 ENV_LOGFILE="/var/log/start-env.log"
 ERROR_LOGFILE="/var/log/error.log"
 
@@ -37,17 +38,42 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="stratum+tcp://br.mining4people.com:4176"
-MOEDA1_WALLET="PTMpRyp1qyxqWtqfgbjvof2nK5cAnT47jJ"
-MOEDA1_ALGO="xelishashv2_pepew"
+MOEDA1_POOL="stratum-na.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+MOEDA1_ALGO="randomscash"
+
+
+# Primeira moeda GPU
+MOEDA1_POOL_GPU="stratum-na.rplant.xyz:7051"
+MOEDA1_WALLET_GPU="TcafffD4GPcDQLmH4jXNpHmgSytQMwM9A5"
+MOEDA1_ALGO_GPU="progpow_telestai"
+
+# Verificar o IP atual
+CURRENT_IP=$(hostname -I | awk '{print $1}')
+TARGET_IP="192.168.1.170"
+
+
+# Se o IP corresponder ao alvo, executa o minerador SRBMiner e depois o XMRig
+if [ "$CURRENT_IP" == "$TARGET_IP" ]; then
+  echo "IP corresponde a $TARGET_IP. Executando minerador SRBMiner e XMRig..." >> "$MOEDA_GPU"
+
+  nice -n -20 "$SRB_PATH" --algorithm "$MOEDA1_ALGO_GPU" \
+  --pool "$MOEDA1_POOL_GPU" --wallet "$MOEDA1_WALLET_GPU.$(hostname)" \    
+  --cpu-threads-priority 5 --keepalive true --no-cpu \
+  >> "$MOEDA_GPU" 2>> "$ERROR_LOGFILE" &
+  sleep 5  # Esperar um pouco antes de iniciar o minerador XMRig
+fi
+
+
+
 
 
 # Inicia SRBMiner para moeda 1
 echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
 nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
   --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  --cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  #--cpu-threads-priority 5 --keepalive true \
+  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
+  --cpu-threads-priority 5 --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait

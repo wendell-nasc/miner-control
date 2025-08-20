@@ -1,0 +1,23 @@
+#sudo nano /etc/systemd/system/srbminer-telestai.service
+#sudo systemctl enable srbminer-telestai
+#sudo systemctl start srbminer-telestai
+#sudo systemctl status srbminer-telestai
+#sudo systemctl disable srbminer-telestai
+#sudo systemctl stop srbminer-telestai
+#sudo systemctl start srbminer-restart
+#sudo journalctl -f -u srbminer-telestai
+
+
+[Unit]
+Description=SRBMiner-MULTI (Telestai)
+After=network.target
+
+[Service]
+User=wendell
+WorkingDirectory=/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/
+ExecStart=/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --algorithm progpow_telestai --pool stratum-na.rplant.xyz:7051 --wallet TcafffD4GPcDQLmH4jXNpHmgSytQMwM9A5.rx580 --keepalive true --no-cpu
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

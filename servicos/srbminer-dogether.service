@@ -1,0 +1,25 @@
+#sudo nano /etc/systemd/system/srbminer-dogether.service
+#sudo systemctl enable srbminer-dogether
+#sudo systemctl start srbminer-dogether
+#sudo systemctl disable srbminer-dogether
+#sudo systemctl stop srbminer-dogether
+#sudo systemctl daemon-reload
+sudo systemctl status srbminer-dogether
+#sudo journalctl -f -u srbminer-dogether
+
+
+
+
+[Unit]
+Description=SRBMiner-MULTI (dogether)
+After=network.target
+
+[Service]
+User=wendell
+WorkingDirectory=/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/
+ExecStart=/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --algorithm ethash --pool us-east.gtpool.io:9999 --wallet AVaBvx1sax7t7XrZDNgcJ93.rx580 --keepalive true --no-cpu 
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

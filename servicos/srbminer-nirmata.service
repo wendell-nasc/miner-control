@@ -1,0 +1,28 @@
+# sudo nano /etc/systemd/system/srbminer-nirmata.service
+# sudo systemctl enable srbminer-nirmata
+# sudo systemctl start srbminer-nirmata
+# sudo systemctl disable srbminer-nirmata
+# sudo systemctl stop srbminer-nirmata
+# sudo systemctl daemon-reload
+# sudo journalctl -f -u srbminer-nirmata
+sudo systemctl restart srbminer-nirmata
+
+
+
+
+[Unit]
+Description=SRBMiner-MULTI (nirmata)
+After=network.target
+
+[Service]
+User=wendell
+WorkingDirectory=/home/wendell/SRBMiner/SRBMiner-Multi-2-9-4/
+ExecStart=/home/wendell/SRBMiner/SRBMiner-Multi-2-9-4/SRBMiner-MULTI --disable-cpu --algorithm progpow_zano --pool nir-us.kryptex.network:7023 --wallet Nn2gwAxPVhZFvUDEyRohfVfcTGccKYVzDYdscVqiydNvFeWMZrHLihhXfjfByGcp4CdWEpP9yXuCEc5oQ9ty5kPf1L9CCA2z1/rx580
+Restart=no  # Sem reinícios automáticos
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+

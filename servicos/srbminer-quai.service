@@ -1,0 +1,24 @@
+#sudo nano /etc/systemd/system/srbminer-quai.service
+#sudo systemctl enable srbminer-quai
+#sudo systemctl start srbminer-quai
+#sudo systemctl disable srbminer-quai
+#sudo systemctl stop srbminer-quai
+#sudo systemctl daemon-reload
+#sudo journalctl -f -u srbminer-quai
+
+
+
+
+[Unit]
+Description=SRBMiner-MULTI (Quai)
+After=network.target
+
+[Service]
+User=wendell
+WorkingDirectory=/home/wendell/SRBMiner/SRBMiner-Multi-2-9-4/
+ExecStart=/home/wendell/SRBMiner/SRBMiner-Multi-2-9-4/SRBMiner-MULTI --algorithm progpow-quai --pool br.quai.gfwroute.com:1185 --wallet 0x00241020a4a6eb42afdA9F3832abc5072c9Ae256.rx580 --keepalive true --no-cpu --send-stales true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
