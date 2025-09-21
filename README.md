@@ -1,4 +1,7 @@
 <!-- markdownlint-disable -->
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh                                     
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service  && sudo systemctl start xdag_gustavo.service 
+sudo EDITOR=nano crontab -e
 
 # sSERVICOS DERO APURAR ...
 systemctl list-units --type=service
