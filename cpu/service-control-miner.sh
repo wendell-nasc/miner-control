@@ -1,77 +1,54 @@
 #!/bin/bash
 
-# Definir arquivos de log
-XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
-ENV_LOGFILE="/var/log/start-env.log"
-ERROR_LOGFILE="/var/log/start-miner-errors.log"
 
-# Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
-    if [ ! -f "$logfile" ]; then
-        touch "$logfile"
-    fi
+# Caminho dos logs
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
+
+# Criar arquivos de log
+for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+    touch "$logfile"
     chmod 644 "$logfile"
 done
 
-# Exportar o PATH para garantir o ambiente adequado
+# Exporta PATH
 export PATH="$PATH"
 
-# Log das variáveis de ambiente
+# Log de variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o XMRig
-XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
-XMRIG_POOL="stratum.xdag.org:23656"
-XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
-XMRIG_ALGO="rx/xdag"
-XMRIG_THREADS=$(nproc)
-XMRIG_HTTP_PORT="37329"
-XMRIG_HTTP_TOKEN="auth"
-XMRIG_DONATE_LEVEL="1"
-CONFIG="/opt/xmrig/config.json"
+# Threads
+TOTAL_THREADS=$(nproc)
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-# Criar ou atualizar o arquivo de configuração do XMRig
-cat > "$CONFIG" <<EOL
-{
-    "autosave": true,
-    "cpu": {
-        "enabled": true,
-        "huge-pages": true,
-        "hw-aes": true,
-        "priority": 5,
-        "memory-pool": true,
-        "max-threads-hint": 100,
-        "asm": true,
-        "argon2-impl": null,
-        "astrobwt-max-size": 550,
-        "astrobwt-avx2": true,
-        "1gb-pages": true
-    },
-    "http": {
-        "enabled": true,
-        "host": "127.0.0.1",
-        "port": 37329,
-        "access-token": "auth",
-        "restricted": false
-    }
-}
-EOL
+# Caminho do binário SRBMiner
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
 
-# Garantir que o arquivo de configuração tenha permissões adequadas
-chmod 644 "$CONFIG"
-
-# Validar a existência do binário XMRig
-if [ -x "$XMRIG_BINARY" ]; then
-    echo "$(date): Iniciando XMRig Miner..." >> "$XMRIG_LOGFILE"
-    "$XMRIG_BINARY" -o "$XMRIG_POOL" -u "$XMRIG_USER" -t "$XMRIG_THREADS" --algo="$XMRIG_ALGO" --donate-level="$XMRIG_DONATE_LEVEL" --config="$CONFIG" >> "$XMRIG_LOGFILE" 2>> "$ERROR_LOGFILE" &
-else
-    echo "$(date): ERRO: Binário XMRig não encontrado ou sem permissões em $XMRIG_BINARY" >> "$ERROR_LOGFILE"
+# Verifica existência do SRBMiner
+if [ ! -f "$SRB_PATH" ]; then
+    echo "SRBMiner não encontrado. Baixando..." >> "$ERROR_LOGFILE"
+    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
+    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz
+    echo "SRBMiner baixado com sucesso." >> "$ENV_LOGFILE"
 fi
 
+# Primeira moeda (ex: SCASH)
+MOEDA1_POOL="stratum-na.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+MOEDA1_ALGO="randomscash"
 
-# Esperar os processos em segundo plano
+
+# Inicia SRBMiner para moeda 1
+echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
+nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+  --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
+  --cpu-threads-priority 5 --keepalive true \
+  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+
 wait
-
-# Mensagem final
-echo "$(date): Mineradores iniciados com sucesso." | tee -a "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE"
+echo "$(date): Ambos mineradores iniciados com sucesso."
