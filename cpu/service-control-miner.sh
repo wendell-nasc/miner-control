@@ -24,7 +24,7 @@ THREADS1=$((TOTAL_THREADS / 2))
 THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
 # Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
-SRB_PATH="/home/wendell/SRBMiner/srbminer_custom/srbminer_custom_bin"
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-9-8/SRBMiner-MULTI"
 
 # Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
 if [ ! -f "$SRB_PATH" ]; then
