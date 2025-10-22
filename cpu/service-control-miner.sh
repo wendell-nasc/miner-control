@@ -66,7 +66,7 @@ MOEDA1_ALGO="randomvirel"
 echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
 nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
   --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  --cpu-threads-priority 5 --keepalive true \
+   --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
