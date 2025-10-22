@@ -24,7 +24,7 @@ THREADS1=$((TOTAL_THREADS / 2))
 THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
 # Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
-SRB_PATH="/home/wendell/SRBMiner/srbminer_custom-2.9.8/srbminer_multicore"
+SRB_PATH="/home/wendell/SRBMiner/srbminer_custom/srbminer_custom_bin"
 
 # Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
 if [ ! -f "$SRB_PATH" ]; then
@@ -35,7 +35,7 @@ if [ ! -f "$SRB_PATH" ]; then
     rm -rf SRBMiner-Multi-* srbminer_custom-*
     
     # Baixa a versão mais recente 2.9.8
-    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/srbminer_custom-2.9.8.tar.gz
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
     
     # Extrai o arquivo
     tar -xvf srbminer_custom-2.9.8.tar.gz
