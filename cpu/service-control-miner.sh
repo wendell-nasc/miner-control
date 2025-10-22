@@ -38,7 +38,7 @@ if [ ! -f "$SRB_PATH" ]; then
     wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
     
     # Extrai o arquivo
-    tar -xvf srbminer_custom-2.9.8.tar.gz
+    tar -xvf SRBMiner-Multi-2-9-8-Linux.tar.gz
     
     # Verifica se a extração foi bem sucedida
     if [ -f "$SRB_PATH" ]; then
@@ -61,12 +61,11 @@ MOEDA1_POOL="stratum-na.rplant.xyz:7155"
 MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
 MOEDA1_ALGO="randomvirel"
 
-
-# Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8)
+# Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
 echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
-nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
   --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-   --keepalive true \
+  --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
