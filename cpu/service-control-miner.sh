@@ -58,8 +58,8 @@ fi
 
 # Primeira moeda (ex: SCASH)
 MOEDA1_POOL="stratum-na.rplant.xyz:7155"
-# MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
-MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
+MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+#MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
 MOEDA1_ALGO="randomvirel"
 
