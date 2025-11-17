@@ -1,0 +1,16 @@
+[Unit]
+Description=Verificação automática de disco e blocos defeituosos
+DefaultDependencies=no
+After=local-fs.target
+Before=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/fix_disk.sh
+TimeoutSec=0
+StandardOutput=journal
+StandardError=journal
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

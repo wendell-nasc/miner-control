@@ -1,82 +1,88 @@
-#sudo nano /etc/systemd/system/start-xdag_gustavo.sh sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 
+# passo 1
+sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh && sudo nano /etc/systemd/system/start-xdag_gustavo.sh 
 
-#!/bin/bash
-
-# Definir arquivos de log
-XMRIG_LOGFILE="/var/log/start-xmrig-xdag_gustavo.log"
-DEROLUNA_LOGFILE="/var/log/start-deroluna-xdag_gustavo.log"
-ENV_LOGFILE="/var/log/start-env.log"
-
-# Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$XMRIG_LOGFILE" "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
-    touch "$logfile"
-    chmod 644 "$logfile"
-done
-
-# Exportar o PATH para garantir o ambiente adequado
-export PATH="$PATH"
-
-# Log das variáveis de ambiente
-env >> "$ENV_LOGFILE"
-
-# Variáveis para o XMRig
-XMRIG_BINARY="/home/wendell/xdag/xmrig-4-xdag/xmrig-4-xdag"
-XMRIG_POOL="stratum.xdag.org:23656"
-XMRIG_USER="Dzdbr5d8PVafQwvEkEwfNde7mFKNDaDSv.$(hostname)"
-XMRIG_ALGO="rx/xdag"
-XMRIG_THREADS=$(nproc)
-XMRIG_HTTP_PORT="37329"
-XMRIG_HTTP_TOKEN="auth"
-XMRIG_DONATE_LEVEL="1"
-CONFIG="/opt/xmrig/config.json"
 
 
 
 #!/bin/bash
 
-# Definir arquivos de log
-DEROLUNA_LOGFILE="/var/log/start-deroluna-hansen.log"
+# Caminho dos logs
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
 ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
 
-# Garantir que os arquivos de log existam e tenham permissões adequadas
-for logfile in "$DEROLUNA_LOGFILE" "$ENV_LOGFILE"; do
+# Criar arquivos de log
+for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
 
-# Exportar o PATH para garantir o ambiente adequado
+# Exporta PATH
 export PATH="$PATH"
 
-# Log das variáveis de ambiente
+# Log de variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Variáveis para o Deroluna Miner
-DEROLUNA_BINARY="/home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64"
-# DEROLUNA_POOL="dero-node-gustavogerman.mysrv.cloud:10100"
-DEROLUNA_POOL="192.168.1.168:10100"
-DEROLUNA_WALLET="dero1qy25zmq2kdzk644r9v89e5ukvkfahxecprduxcnh7zx0nndnl5y2vqqwpeu7z"
-DEROLUNA_THREADS=$(nproc)
+# Threads
+TOTAL_THREADS=$(nproc)
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-# Verificar se o minerador existe, caso contrário, baixar e extrair
-if [ ! -f "$DEROLUNA_BINARY" ]; then
-    echo "Minerador não encontrado. Baixando e extraindo..." >> "$DEROLUNA_LOGFILE"
-    wget https://github.com/Hansen333/Hansen33-s-DERO-Miner/releases/latest/download/hansen33s-dero-miner-linux-amd64.tar.gz -P /home/wendell/dero_linux_amd64
-    sudo tar -xvf /home/wendell/dero_linux_amd64/hansen33s-dero-miner-linux-amd64.tar.gz -C /home/wendell/dero_linux_amd64
-    echo "Minerador baixado e extraído." >> "$DEROLUNA_LOGFILE"
+# Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-9-8/SRBMiner-MULTI"
+
+# Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+if [ ! -f "$SRB_PATH" ]; then
+    echo "SRBMiner não encontrado. Baixando versão 2.9.8..." >> "$ERROR_LOGFILE"
+    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
+    
+    # Remove versões antigas se existirem
+    rm -rf SRBMiner-Multi-* srbminer_custom-*
+    
+    # Baixa a versão mais recente 2.9.8
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
+    
+    # Extrai o arquivo
+    tar -xvf SRBMiner-Multi-2-9-8-Linux.tar.gz
+    
+    # Verifica se a extração foi bem sucedida
+    if [ -f "$SRB_PATH" ]; then
+        echo "SRBMiner 2.9.8 baixado e extraído com sucesso." >> "$ENV_LOGFILE"
+        # Torna o executável
+        chmod +x "$SRB_PATH"
+    else
+        echo "ERRO: SRBMiner não foi extraído corretamente." >> "$ERROR_LOGFILE"
+        echo "Tentando encontrar o binário..." >> "$ERROR_LOGFILE"
+        # Tenta encontrar o binário em subdiretórios
+        find /home/wendell/SRBMiner -name "srbminer*" -type f -executable >> "$ERROR_LOGFILE" 2>&1
+        exit 1
+    fi
 else
-    echo "Minerador encontrado. Prosseguindo..." >> "$DEROLUNA_LOGFILE"
+    echo "SRBMiner 2.9.8 já está instalado." >> "$ENV_LOGFILE"
 fi
 
-# Iniciar o minerador Deroluna
-echo "Iniciando Deroluna Miner..." >> "$DEROLUNA_LOGFILE"
-"$DEROLUNA_BINARY" -daemon-rpc-address "$DEROLUNA_POOL" -wallet-address "$DEROLUNA_WALLET" -mining-threads "$DEROLUNA_THREADS" -turbo >> "$DEROLUNA_LOGFILE" 2>> /var/log/start-deroluna-errors.log &
+# Primeira moeda (ex: SCASH)
+MOEDA1_POOL="stratum-na.rplant.xyz:7155"
+MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+#MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
-# Esperar os processos em segundo plano
+MOEDA1_ALGO="randomvirel"
+
+# Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
+echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+--pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+--keepalive true \
+>> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+
 wait
+echo "$(date): Ambos mineradores iniciados com sucesso com SRBMiner 2.9.8." >> "$ENV_LOGFILE"
 
-echo "Mineradores iniciados."
 
+
+ # passo 2   
 
 
 

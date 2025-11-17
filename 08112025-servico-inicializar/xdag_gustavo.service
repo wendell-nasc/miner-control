@@ -1,0 +1,19 @@
+[Unit]
+Description=Start XMRig and Deroluna Miners
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/etc/systemd/system/start-xdag_gustavo.sh
+WorkingDirectory=/opt/xdag_gustavo
+Restart=on-failure
+RestartSec=15
+User=wendell
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=miners
+Nice=10
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

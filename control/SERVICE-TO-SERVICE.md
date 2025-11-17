@@ -1,9 +1,11 @@
-# CONFIGURAÇÃO DO HIVE
+# CONFIGURAÇÃO 
+
+sudo nano /opt/service-control.sh
+sudo chmod +x /opt/service-control.sh
+sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
 
 
 - CRONTAB
-sudo chmod +x /opt/service-control.sh
-sudo timedatectl set-timezone America/Sao_Paulo && sudo EDITOR=nano crontab -e
 
 
 0 */4 * * * systemctl restart xdag_gustavo.service
