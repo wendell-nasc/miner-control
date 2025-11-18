@@ -26,36 +26,17 @@ VRL_DIR="/home/wendell/xmrig-vrl"
 VRL_VERSION="6.0.24-virel"
 VRL_TGZ="xmrig-vrl-linux.tar.xz"
 VRL_URL="https://github.com/rplant8/xmrig-vrl/releases/download/${VRL_VERSION}/${VRL_TGZ}"
-VRL_EXTRACT_DIR="$VRL_DIR/xmrig-proxy-vrl-linux"
+VRL_EXTRACT_DIR="$VRL_DIR"
 VRL_PATH="$VRL_EXTRACT_DIR/xmrig-vrl"
 
-# Verifica se existe o binário
-if [ ! -f "$VRL_PATH" ]; then
-    echo "$(date): XMRig-VRL não encontrado. Baixando versão $VRL_VERSION..." >> "$ERROR_LOGFILE"
+# Baixa somente se NÃO existir
+if [ ! -f "$VRL_DIR" ]; then
+    wget -O "$VRL_DIR" "$VRL_URL"
+fi
 
-    mkdir -p "$VRL_DIR" || exit 1
-    cd "$VRL_DIR" || exit 1
-
-    # Remove versões antigas
-    rm -rf xmrig-* xmrig-vrl* xmrig-proxy-vrl-linux*
-
-    # Baixar nova versão
-    wget "$VRL_URL" -O "$VRL_TGZ" >> "$ENV_LOGFILE" 2>> "$ERROR_LOGFILE"
-
-    # Extrair arquivos
-    tar -xvf "$VRL_TGZ" >> "$ENV_LOGFILE" 2>> "$ERROR_LOGFILE"
-
-    # Conferir extração
-    if [ -f "$VRL_PATH" ]; then
-        chmod +x "$VRL_PATH"
-        echo "$(date): XMRig-VRL $VRL_VERSION baixado e configurado." >> "$ENV_LOGFILE"
-    else
-        echo "$(date): ERRO: XMRig-VRL não foi extraído corretamente." >> "$ERROR_LOGFILE"
-        find "$VRL_DIR" -type f -executable >> "$ERROR_LOGFILE"
-        exit 1
-    fi
-else
-    echo "$(date): XMRig-VRL $VRL_VERSION já está instalado." >> "$ENV_LOGFILE"
+# Extrai somente se o binário NÃO existir
+if [ ! -f "$BIN" ]; then
+    tar -xf "$VRL_DIR" -C "$VRL_DIR"
 fi
 
 

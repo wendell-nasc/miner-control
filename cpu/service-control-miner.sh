@@ -14,9 +14,7 @@ for logfile in "$MOEDA1_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
     chmod 644 "$logfile"
 done
 
-# Log de variáveis de ambiente
 env >> "$ENV_LOGFILE"
-
 
 # ============================================================================
 # CONFIGURAÇÃO DO XMRIG-VRL
@@ -26,50 +24,74 @@ VRL_DIR="/home/wendell/xmrig-vrl"
 VRL_VERSION="6.0.24-virel"
 VRL_TGZ="xmrig-vrl-linux.tar.xz"
 VRL_URL="https://github.com/rplant8/xmrig-vrl/releases/download/${VRL_VERSION}/${VRL_TGZ}"
-VRL_EXTRACT_DIR="$VRL_DIR/xmrig-proxy-vrl-linux"
-VRL_PATH="$VRL_EXTRACT_DIR/xmrig-vrl"
 
-# Verifica se existe o binário
-if [ ! -f "$VRL_PATH" ]; then
-    echo "$(date): XMRig-VRL não encontrado. Baixando versão $VRL_VERSION..." >> "$ERROR_LOGFILE"
+VRL_TGZ_PATH="$VRL_DIR/$VRL_TGZ"
+VRL_PATH="$VRL_DIR/xmrig-vrl"
 
-    mkdir -p "$VRL_DIR" || exit 1
-    cd "$VRL_DIR" || exit 1
+# Criar diretório
+mkdir -p "$VRL_DIR"
 
-    # Remove versões antigas
-    rm -rf xmrig-* xmrig-vrl* xmrig-proxy-vrl-linux*
+# SEMPRE REMOVER VERSÕES ANTERIORES
+echo "$(date): Removendo versões anteriores do XMRig-VRL..." >> "$ENV_LOGFILE"
+rm -rf "$VRL_DIR"/*
+rm -f "$VRL_TGZ_PATH"
 
-    # Baixar nova versão
-    wget "$VRL_URL" -O "$VRL_TGZ" >> "$ENV_LOGFILE" 2>> "$ERROR_LOGFILE"
-
-    # Extrair arquivos
-    tar -xvf "$VRL_TGZ" >> "$ENV_LOGFILE" 2>> "$ERROR_LOGFILE"
-
-    # Conferir extração
-    if [ -f "$VRL_PATH" ]; then
-        chmod +x "$VRL_PATH"
-        echo "$(date): XMRig-VRL $VRL_VERSION baixado e configurado." >> "$ENV_LOGFILE"
-    else
-        echo "$(date): ERRO: XMRig-VRL não foi extraído corretamente." >> "$ERROR_LOGFILE"
-        find "$VRL_DIR" -type f -executable >> "$ERROR_LOGFILE"
-        exit 1
-    fi
+# SEMPRE BAIXAR NOVA VERSÃO
+echo "$(date): Baixando XMRig-VRL..." >> "$ENV_LOGFILE"
+if wget -O "$VRL_TGZ_PATH" "$VRL_URL" 2>> "$ERROR_LOGFILE"; then
+    echo "$(date): Download concluído com sucesso" >> "$ENV_LOGFILE"
 else
-    echo "$(date): XMRig-VRL $VRL_VERSION já está instalado." >> "$ENV_LOGFILE"
+    echo "$(date): ERRO: Falha no download do XMRig-VRL" >> "$ERROR_LOGFILE"
+    exit 1
 fi
 
+# SEMPRE EXTRAIR NOVA VERSÃO
+echo "$(date): Extraindo XMRig-VRL..." >> "$ENV_LOGFILE"
+if tar -xf "$VRL_TGZ_PATH" -C "$VRL_DIR" 2>> "$ERROR_LOGFILE"; then
+    echo "$(date): Extração concluída com sucesso" >> "$ENV_LOGFILE"
+    
+    # Encontrar o binário extraído (pode ter nome diferente)
+    if [ -f "$VRL_PATH" ]; then
+        chmod +x "$VRL_PATH"
+        echo "$(date): Binário encontrado e permissões configuradas: $VRL_PATH" >> "$ENV_LOGFILE"
+    else
+        # Tentar encontrar o binário com nome diferente
+        BINARY=$(find "$VRL_DIR" -name "xmrig*" -type f -executable | head -1)
+        if [ -n "$BINARY" ]; then
+            VRL_PATH="$BINARY"
+            echo "$(date): Binário encontrado: $VRL_PATH" >> "$ENV_LOGFILE"
+        else
+            echo "$(date): ERRO: Não foi possível encontrar o binário do XMRig" >> "$ERROR_LOGFILE"
+            exit 1
+        fi
+    fi
+    
+    # Limpar arquivo tar após extração
+    rm -f "$VRL_TGZ_PATH"
+    echo "$(date): Arquivo tar removido" >> "$ENV_LOGFILE"
+else
+    echo "$(date): ERRO: Falha na extração do XMRig-VRL" >> "$ERROR_LOGFILE"
+    exit 1
+fi
 
 # ============================================================================
-# CONFIGURAÇÃO DA MOEDA 1 — RANDOMVIREL (SCASH)
+# MINERAÇÃO RANDOMVIREL
 # ============================================================================
 
 MOEDA1_POOL="na.rplant.xyz:17155"
 MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
 MOEDA1_ALGO="rx/vrl"
-
 TOTAL_THREADS=$(nproc)
 
-echo "$(date): Iniciando mineração Moeda 1 com XMRig-VRL $VRL_VERSION..." >> "$MOEDA1_LOGFILE"
+echo "$(date): Iniciando mineração..." >> "$MOEDA1_LOGFILE"
+
+# Verificar se o binário existe e é executável
+if [ ! -f "$VRL_PATH" ] || [ ! -x "$VRL_PATH" ]; then
+    echo "$(date): ERRO: Binário do XMRig não encontrado ou não executável: $VRL_PATH" >> "$ERROR_LOGFILE"
+    exit 1
+fi
+
+echo "$(date): Executando: $VRL_PATH" >> "$ENV_LOGFILE"
 
 "$VRL_PATH" \
     -a "$MOEDA1_ALGO" \
@@ -83,7 +105,11 @@ echo "$(date): Iniciando mineração Moeda 1 com XMRig-VRL $VRL_VERSION..." >> "
 
 PID1=$!
 
-echo "$(date): Minerador XMRig-VRL iniciado. PID=$PID1" >> "$ENV_LOGFILE"
+echo "$(date): XMRig-VRL iniciado. PID=$PID1" >> "$ENV_LOGFILE"
 
-wait "$PID1"
+# Manter o script rodando para o systemd não pensar que terminou
+while kill -0 "$PID1" 2>/dev/null; do
+    sleep 30
+done
+
 echo "$(date): XMRig-VRL finalizou." >> "$ENV_LOGFILE"
