@@ -77,6 +77,7 @@ echo "$(date): Iniciando mineração Moeda 1 com SRBMiner $SRB_VERSION..." >> "$
     --pool "$MOEDA1_POOL" \
     --wallet "$MOEDA1_WALLET.$(hostname)" \
     --cpu-threads "$TOTAL_THREADS" \
+    --password m=solo \
     --keepalive true \
     >> "$MOEDA1_LOGFILE" \
     2>> "$ERROR_LOGFILE" &
