@@ -1,115 +1,74 @@
-#!/bin/bash
+    #!/bin/bash
 
-# ============================================================================
-# CONFIGURAÇÃO DE LOGS
-# ============================================================================
+    # Caminho dos logs
+    MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+    MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+    ENV_LOGFILE="/var/log/start-env.log"
+    ERROR_LOGFILE="/var/log/error.log"
 
-MOEDA1_LOGFILE="/var/log/XMRIG_VRL_MOEDA1.log"
-ENV_LOGFILE="/var/log/start-env.log"
-ERROR_LOGFILE="/var/log/error.log"
+    # Criar arquivos de log
+    for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+        touch "$logfile"
+        chmod 644 "$logfile"
+    done
 
-# Criar arquivos de log
-for logfile in "$MOEDA1_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
-    touch "$logfile"
-    chmod 644 "$logfile"
-done
+    # Exporta PATH
+    export PATH="$PATH"
 
-env >> "$ENV_LOGFILE"
+    # Log de variáveis de ambiente
+    env >> "$ENV_LOGFILE"
 
-# ============================================================================
-# CONFIGURAÇÃO DO XMRIG-VRL
-# ============================================================================
+    # Threads
+    TOTAL_THREADS=$(nproc)
+    THREADS1=$((TOTAL_THREADS / 2))
+    THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-VRL_DIR="/home/wendell/xmrig-vrl"
-VRL_VERSION="6.0.24-virel"
-VRL_TGZ="xmrig-vrl-linux.tar.xz"
-VRL_URL="https://github.com/rplant8/xmrig-vrl/releases/download/${VRL_VERSION}/${VRL_TGZ}"
+    # Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+    SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-9-8/SRBMiner-MULTI"
 
-VRL_TGZ_PATH="$VRL_DIR/$VRL_TGZ"
-VRL_PATH="$VRL_DIR/xmrig-vrl"
-
-# Criar diretório
-mkdir -p "$VRL_DIR"
-
-# SEMPRE REMOVER VERSÕES ANTERIORES
-echo "$(date): Removendo versões anteriores do XMRig-VRL..." >> "$ENV_LOGFILE"
-rm -rf "$VRL_DIR"/*
-rm -f "$VRL_TGZ_PATH"
-
-# SEMPRE BAIXAR NOVA VERSÃO
-echo "$(date): Baixando XMRig-VRL..." >> "$ENV_LOGFILE"
-if wget -O "$VRL_TGZ_PATH" "$VRL_URL" 2>> "$ERROR_LOGFILE"; then
-    echo "$(date): Download concluído com sucesso" >> "$ENV_LOGFILE"
-else
-    echo "$(date): ERRO: Falha no download do XMRig-VRL" >> "$ERROR_LOGFILE"
-    exit 1
-fi
-
-# SEMPRE EXTRAIR NOVA VERSÃO
-echo "$(date): Extraindo XMRig-VRL..." >> "$ENV_LOGFILE"
-if tar -xf "$VRL_TGZ_PATH" -C "$VRL_DIR" 2>> "$ERROR_LOGFILE"; then
-    echo "$(date): Extração concluída com sucesso" >> "$ENV_LOGFILE"
-    
-    # Encontrar o binário extraído (pode ter nome diferente)
-    if [ -f "$VRL_PATH" ]; then
-        chmod +x "$VRL_PATH"
-        echo "$(date): Binário encontrado e permissões configuradas: $VRL_PATH" >> "$ENV_LOGFILE"
-    else
-        # Tentar encontrar o binário com nome diferente
-        BINARY=$(find "$VRL_DIR" -name "xmrig*" -type f -executable | head -1)
-        if [ -n "$BINARY" ]; then
-            VRL_PATH="$BINARY"
-            echo "$(date): Binário encontrado: $VRL_PATH" >> "$ENV_LOGFILE"
+    # Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+    if [ ! -f "$SRB_PATH" ]; then
+        echo "SRBMiner não encontrado. Baixando versão 2.9.8..." >> "$ERROR_LOGFILE"
+        mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
+        
+        # Remove versões antigas se existirem
+        rm -rf SRBMiner-Multi-* srbminer_custom-*
+        
+        # Baixa a versão mais recente 2.9.8
+        wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
+        
+        # Extrai o arquivo
+        tar -xvf SRBMiner-Multi-2-9-8-Linux.tar.gz
+        
+        # Verifica se a extração foi bem sucedida
+        if [ -f "$SRB_PATH" ]; then
+            echo "SRBMiner 2.9.8 baixado e extraído com sucesso." >> "$ENV_LOGFILE"
+            # Torna o executável
+            chmod +x "$SRB_PATH"
         else
-            echo "$(date): ERRO: Não foi possível encontrar o binário do XMRig" >> "$ERROR_LOGFILE"
+            echo "ERRO: SRBMiner não foi extraído corretamente." >> "$ERROR_LOGFILE"
+            echo "Tentando encontrar o binário..." >> "$ERROR_LOGFILE"
+            # Tenta encontrar o binário em subdiretórios
+            find /home/wendell/SRBMiner -name "srbminer*" -type f -executable >> "$ERROR_LOGFILE" 2>&1
             exit 1
         fi
+    else
+        echo "SRBMiner 2.9.8 já está instalado." >> "$ENV_LOGFILE"
     fi
-    
-    # Limpar arquivo tar após extração
-    rm -f "$VRL_TGZ_PATH"
-    echo "$(date): Arquivo tar removido" >> "$ENV_LOGFILE"
-else
-    echo "$(date): ERRO: Falha na extração do XMRig-VRL" >> "$ERROR_LOGFILE"
-    exit 1
-fi
 
-# ============================================================================
-# MINERAÇÃO RANDOMVIREL
-# ============================================================================
+    # Primeira moeda (ex: SCASH)
+    MOEDA1_POOL="stratum-na.rplant.xyz:7155"
+    MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+    #MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
-MOEDA1_POOL="na.rplant.xyz:17155"
-MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
-MOEDA1_ALGO="rx/vrl"
-TOTAL_THREADS=$(nproc)
+    MOEDA1_ALGO="randomvirel"
 
-echo "$(date): Iniciando mineração..." >> "$MOEDA1_LOGFILE"
+    # Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
+    echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
+    "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+    --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+    --keepalive true \
+    >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-# Verificar se o binário existe e é executável
-if [ ! -f "$VRL_PATH" ] || [ ! -x "$VRL_PATH" ]; then
-    echo "$(date): ERRO: Binário do XMRig não encontrado ou não executável: $VRL_PATH" >> "$ERROR_LOGFILE"
-    exit 1
-fi
-
-echo "$(date): Executando: $VRL_PATH" >> "$ENV_LOGFILE"
-
-"$VRL_PATH" \
-    -a "$MOEDA1_ALGO" \
-    -o "$MOEDA1_POOL" \
-    -u "$MOEDA1_WALLET.$(hostname)" \
-    --threads="$TOTAL_THREADS" \
-    --keepalive \
-    --no-color \
-    >> "$MOEDA1_LOGFILE" \
-    2>> "$ERROR_LOGFILE" &
-
-PID1=$!
-
-echo "$(date): XMRig-VRL iniciado. PID=$PID1" >> "$ENV_LOGFILE"
-
-# Manter o script rodando para o systemd não pensar que terminou
-while kill -0 "$PID1" 2>/dev/null; do
-    sleep 30
-done
-
-echo "$(date): XMRig-VRL finalizou." >> "$ENV_LOGFILE"
+    wait
+    echo "$(date): Ambos mineradores iniciados com sucesso com SRBMiner 2.9.8." >> "$ENV_LOGFILE"
