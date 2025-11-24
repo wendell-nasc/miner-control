@@ -66,7 +66,7 @@ MOEDA1_ALGO="randomx"
 
 # Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
 echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
-"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads "$TOTAL_THREADS" \
 --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
