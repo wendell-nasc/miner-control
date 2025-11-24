@@ -1,0 +1,78 @@
+#!/bin/bash
+
+
+# Caminho dos logs
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
+
+# Criar arquivos de log
+for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+    touch "$logfile"
+    chmod 644 "$logfile"
+done
+
+# Exporta PATH
+export PATH="$PATH"
+
+# Log de variáveis de ambiente
+env >> "$ENV_LOGFILE"
+
+# Threads
+TOTAL_THREADS=$(nproc)
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
+
+# Caminho do binário SRBMiner
+XMRIG_PATH="/opt/xmrig/xmrig"
+
+
+# Primeira moeda (ex: SCASH)
+MOEDA1_POOL="us.0xpool.io:3333"
+MOEDA1_WALLET="0xe51e5d5282386bde64269892256df1af948cdf9b"
+MOEDA1_ALGO="rx/0"
+XMRIG_CONFIG="/opt/xmrig/config.json"
+
+
+
+# Gera config do XMRig
+cat > "$XMRIG_CONFIG" <<EOL
+{
+    "name": "Tari RandomX pool",
+    "isFavorite": false,
+    "items": [
+        {
+            "coin": "tari",
+            "pool_ssl": false,
+            "wal_id": 10822236,
+            "dpool_ssl": false,
+            "miner": "xmrig-new",
+            "miner_alt": "xmrig",
+            "miner_config": {
+                "cpu": "1",
+                "url": "us.0xpool.io:3333",
+                "algo": "rx/0",
+                "fork": "xmrig",
+                "pass": "x",
+                "template": "%WAL%.%WORKER_NAME%",
+                "hugepages": "1248",
+                "cpu_config": "\"cpu\": {\n  \"huge-pages\": true,\n  \"hw-aes\": null,\n  \"priority\": null,\n  \"memory-pool\": false,\n  \"asm\": true\n}",
+                "user_config": "\"donate-level\": 1"
+            },
+            "pool_geo": []
+        }
+    ]
+}
+EOL
+
+chmod 644 "$XMRIG_CONFIG"
+
+# Inicia SRBMiner para moeda 1
+echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
+nice -n -20 "$XMRIG_PATH"  -o "$MOEDA1_POOL" -u "$MOEDA1_WALLET.$(hostname)" \
+  --algo="$MOEDA1_ALGO" --donate-level=1 --threads="$TOTAL_THREADS" --config="$XMRIG_CONFIG" \
+  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+
+wait
+echo "$(date): Ambos mineradores iniciados com sucesso."

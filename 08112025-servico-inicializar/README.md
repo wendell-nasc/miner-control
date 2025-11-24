@@ -5,6 +5,8 @@ sudo dmidecode | grep -A3 "Base Board"
 
 # geral
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+sudo /etc/systemd/system/start-xdag_gustavo.sh
+
 sudo nano /etc/systemd/system/xdag_gustavo.service
 sudo /opt/atualizar_script_control_e_miner.sh
 
@@ -12,7 +14,6 @@ sudo /opt/atualizar_script_control_e_miner.sh
 sudo systemctl edit --full xdag_gustavo.service
 
 🔹  Aplique e teste
-sudo systemctl daemon-reload && sudo systemctl restart xdag_gustavo.service && sudo systemctl status xdag_gustavo.service
-
+htop
 sudo journalctl -u xdag_gustavo.service -f
 

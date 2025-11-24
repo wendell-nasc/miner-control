@@ -6,7 +6,7 @@ network:
       dhcp4: false
       dhcp6: false
       link-local: []
-      addresses: [192.168.1.152/24]
+      addresses: [192.168.1.148/24]
       gateway4: 192.168.1.254
       routes:
         - to: default

