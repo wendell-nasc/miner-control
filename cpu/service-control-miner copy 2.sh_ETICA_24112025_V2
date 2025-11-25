@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Caminho dos logs
+# Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
 MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
 ENV_LOGFILE="/var/log/start-env.log"
@@ -57,11 +58,11 @@ else
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="stratum-na.rplant.xyz:7155"
-MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+MOEDA1_POOL="us.0xpool.io:3333"
+MOEDA1_WALLET="0xe51e5d5282386bde64269892256df1af948cdf9b"
 #MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
-MOEDA1_ALGO="randomvirel"
+MOEDA1_ALGO="randomx"
 
 # Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
 echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
