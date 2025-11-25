@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Caminho dos logs
+# Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
 MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
 ENV_LOGFILE="/var/log/start-env.log"
