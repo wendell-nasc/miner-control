@@ -1,0 +1,27 @@
+network:
+
+  #sudo apt install netplan.io -y
+
+  #sudo nano /etc/netplan/01-network-manager-all.yaml
+
+  version: 2
+
+  ethernets:
+
+    eth0:
+
+      dhcp4: false
+
+      addresses: [192.168.1.183/24]
+
+      gateway4: 192.168.1.254
+
+      nameservers:
+
+        addresses: [8.8.8.8, 8.8.4.4]
+
+
+
+
+
+

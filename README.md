@@ -20,6 +20,7 @@ sudo sh /opt/service-control.sh && sudo systemctl daemon-reload && sudo systemct
 
 # NOVO SCRIPT
 sudo nano /opt/atualizar_script_control_e_miner.sh
+sudo /opt/atualizar_script_control_e_miner.sh
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh
 
 -asus-fx8120:~$ htop                                                                                                                                                         
@@ -173,6 +174,32 @@ sudo chmod +x /opt/service-control.sh && sudo sh /opt/service-control.sh && sudo
 
 
 sudo systemctl status xdag_gustavo.service
+
+
+# correcao
+# logs
+# Verificar os logs do serviço
+sudo journalctl -u xdag_gustavo.service -f
+
+# Ou ver os últimos logs
+sudo journalctl -u xdag_gustavo.service -n 50
+
+
+# 1. Editar o script
+sudo nano /etc/systemd/system/start-xdag_gustavo.sh
+
+# 2. Cole o conteúdo da Opção 1 acima
+
+# 3. Torne executável
+sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
+
+# 4. Recarregar e testar
+sudo systemctl daemon-reload
+sudo systemctl restart xdag_gustavo.service
+sudo systemctl status xdag_gustavo.service
+
+
+sudo journalctl -u xdag_gustavo.service -n 20 --no-pager
 
 
 
