@@ -1,3 +1,10 @@
+# diagnostico_disco 27112025
+nano diagnostico_disco.sh
+chmod +x diagnostico_disco.sh
+sudo ./diagnostico_disco.sh
+
+
+
 # fping
 sudo nano scan_netbios.sh
 sudo chmod +x scan_netbios.sh

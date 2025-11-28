@@ -195,7 +195,7 @@ sudo chmod +x /etc/systemd/system/start-xdag_gustavo.sh
 
 # 4. Recarregar e testar
 sudo systemctl daemon-reload
-sudo systemctl restart xdag_gustavo.service
+    sudo systemctl restart xdag_gustavo.service
 sudo systemctl status xdag_gustavo.service
 
 
