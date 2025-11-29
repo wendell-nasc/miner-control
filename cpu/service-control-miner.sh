@@ -107,7 +107,7 @@ echo "$(date): Threads Moeda 2: $THREADS2" >> "$ENV_LOGFILE"
 echo "$(date): Iniciando mineração da Moeda 1 (RandomHSCX)..." >> "$MOEDA1_LOGFILE"
 echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA1_ALGO --cpu-threads $THREADS1 --pool $MOEDA1_POOL --wallet $MOEDA1_WALLET.$(hostname) --keepalive true" >> "$MOEDA1_LOGFILE"
 
-"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads "$THREADS1" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO"  \
 --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
@@ -122,7 +122,7 @@ sleep 5
 echo "$(date): Iniciando mineração da Moeda 2 (RandomVIREL)..." >> "$MOEDA2_LOGFILE"
 echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA2_ALGO --cpu-threads $THREADS2 --pool $MOEDA2_POOL --wallet $MOEDA2_WALLET.$(hostname) --keepalive true" >> "$MOEDA2_LOGFILE"
 
-"$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO" --cpu-threads "$THREADS2" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO"  \
 --pool "$MOEDA2_POOL" --wallet "$MOEDA2_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA2_LOGFILE" 2>> "$ERROR_LOGFILE" &
