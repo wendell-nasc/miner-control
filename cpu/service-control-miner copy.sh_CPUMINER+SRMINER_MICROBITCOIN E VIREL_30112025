@@ -31,7 +31,7 @@ ERROR_LOGFILE="$LOG_DIR/error.log"
 
 # Threads
 TOTAL_THREADS=$(nproc)
-THREADS_CPUMINER=$((TOTAL_THREADS / 3))
+THREADS_CPUMINER=$((TOTAL_THREADS / 2))
 THREADS_SRB=$((TOTAL_THREADS - THREADS_CPUMINER))
 
 # ============================================================================
@@ -152,7 +152,7 @@ echo "$(date): Iniciando ambos os mineradores..." >> "$ENV_LOGFILE"
 echo "$(date): Iniciando mineração com SRBMiner 2.9.8..." >> "$SRB_LOGFILE"
 echo "Comando: $SRB_PATH --disable-gpu --algorithm $ALGO_SRB --cpu-threads $THREADS_SRB --pool $POOL_SRB --wallet $WALLET_SRB.$WORKER_NAME --keepalive true" >> "$SRB_LOGFILE"
 
-"$SRB_PATH" --disable-gpu --algorithm "$ALGO_SRB" --cpu-threads "$THREADS_SRB" \
+"$SRB_PATH" --disable-gpu --algorithm "$ALGO_SRB"  \
 --pool "$POOL_SRB" --wallet "$WALLET_SRB.$WORKER_NAME" \
 --keepalive true \
 >> "$SRB_LOGFILE" 2>> "$ERROR_LOGFILE" &
@@ -167,7 +167,7 @@ sleep 5
 echo "$(date): Iniciando mineração com cpuminer..." >> "$CPUMINER_LOGFILE"
 echo "Comando: $CPUMINER_PATH -a $ALGO_CPUMINER -o $POOL_CPUMINER -u $WALLET_CPUMINER.$WORKER_NAME -t $THREADS_CPUMINER" >> "$CPUMINER_LOGFILE"
 
-"$CPUMINER_PATH" -a "$ALGO_CPUMINER" -o "$POOL_CPUMINER" -u "$WALLET_CPUMINER.$WORKER_NAME" -t "$THREADS_CPUMINER" \
+"$CPUMINER_PATH" -a "$ALGO_CPUMINER" -o "$POOL_CPUMINER" -u "$WALLET_CPUMINER.$WORKER_NAME"  \
 >> "$CPUMINER_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 PID_CPUMINER=$!
