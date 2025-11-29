@@ -22,9 +22,10 @@ export PATH="$PATH"
 # Log de variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Threads (apenas para informação)
+# Threads
 TOTAL_THREADS=$(nproc)
-echo "$(date): Sistema com $TOTAL_THREADS threads disponíveis" >> "$ENV_LOGFILE"
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
 # ============================================================================
 # INSTALAÇÃO DO SRBMINER 3.0.5
@@ -98,13 +99,15 @@ MOEDA2_ALGO="randomvirel"
 # ============================================================================
 
 echo "$(date): Iniciando mineração com SRBMiner 3.0.5..." >> "$ENV_LOGFILE"
-echo "$(date): O SRBMiner usará automaticamente todas as threads disponíveis para cada instância" >> "$ENV_LOGFILE"
+echo "$(date): Threads totais: $TOTAL_THREADS" >> "$ENV_LOGFILE"
+echo "$(date): Threads Moeda 1: $THREADS1" >> "$ENV_LOGFILE"
+echo "$(date): Threads Moeda 2: $THREADS2" >> "$ENV_LOGFILE"
 
-# Inicia SRBMiner para moeda 1 (RandomHSCX) - SEM ESPECIFICAR THREADS
+# Inicia SRBMiner para moeda 1 (RandomHSCX)
 echo "$(date): Iniciando mineração da Moeda 1 (RandomHSCX)..." >> "$MOEDA1_LOGFILE"
-echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA1_ALGO --pool $MOEDA1_POOL --wallet $MOEDA1_WALLET.$(hostname) --keepalive true" >> "$MOEDA1_LOGFILE"
+echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA1_ALGO --cpu-threads $TOTAL_THREADS --pool $MOEDA1_POOL --wallet $MOEDA1_WALLET.$(hostname) --keepalive true" >> "$MOEDA1_LOGFILE"
 
-"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads $TOTAL_THREADS \
 --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
@@ -115,11 +118,11 @@ echo "$(date): SRBMiner Moeda 1 iniciado com PID: $PID1" >> "$ENV_LOGFILE"
 # Pequena pausa para garantir que o primeiro minerador inicializou
 sleep 5
 
-# Inicia SRBMiner para moeda 2 (RandomVIREL) - SEM ESPECIFICAR THREADS
+# Inicia SRBMiner para moeda 2 (RandomVIREL)
 echo "$(date): Iniciando mineração da Moeda 2 (RandomVIREL)..." >> "$MOEDA2_LOGFILE"
-echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA2_ALGO --pool $MOEDA2_POOL --wallet $MOEDA2_WALLET.$(hostname) --keepalive true" >> "$MOEDA2_LOGFILE"
+echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $MOEDA2_ALGO --cpu-threads $THREADS2 --pool $MOEDA2_POOL --wallet $MOEDA2_WALLET.$(hostname) --keepalive true" >> "$MOEDA2_LOGFILE"
 
-"$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO" \
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO" --cpu-threads $TOTAL_THREADS \
 --pool "$MOEDA2_POOL" --wallet "$MOEDA2_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA2_LOGFILE" 2>> "$ERROR_LOGFILE" &
@@ -134,7 +137,6 @@ echo "$(date): SRBMiner Moeda 2 iniciado com PID: $PID2" >> "$ENV_LOGFILE"
 echo "$(date): Ambos mineradores iniciados com sucesso!" >> "$ENV_LOGFILE"
 echo "$(date): PID Moeda 1 (RandomHSCX): $PID1" >> "$ENV_LOGFILE"
 echo "$(date): PID Moeda 2 (RandomVIREL): $PID2" >> "$ENV_LOGFILE"
-echo "$(date): Cada instância usará automaticamente todas as threads disponíveis" >> "$ENV_LOGFILE"
 
 # Função para verificar se os processos estão ativos
 check_processes() {
@@ -152,11 +154,9 @@ check_processes() {
 }
 
 # Verificação inicial
-sleep 10
 check_processes
 
 # Aguardar ambos os processos
-echo "$(date): Aguardando finalização dos processos..." >> "$ENV_LOGFILE"
 wait $PID1 $PID2
 
 echo "$(date): Ambos mineradores finalizaram." >> "$ENV_LOGFILE"
