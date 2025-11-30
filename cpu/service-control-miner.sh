@@ -5,13 +5,12 @@
 # ============================================================================
 
 # Caminho dos logs
-MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
-MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+MOEDA_LOGFILE="/var/log/SRB_VIREL.log"
 ENV_LOGFILE="/var/log/start-env.log"
 ERROR_LOGFILE="/var/log/error.log"
 
 # Criar arquivos de log
-for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+for logfile in "$MOEDA_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
@@ -22,44 +21,10 @@ export PATH="$PATH"
 # Log de variáveis de ambiente
 env >> "$ENV_LOGFILE"
 
-# Threads - AFFINITY ESPECÍFICO
+# Threads
 TOTAL_THREADS=$(nproc)
 echo "$(date): Sistema com $TOTAL_THREADS threads" >> "$ENV_LOGFILE"
-
-# Definir affinity específico para cada minerador
-if [ $TOTAL_THREADS -eq 2 ]; then
-    # 2 threads: 0 para minerador1, 1 para minerador2
-    AFFINITY1="0"
-    AFFINITY2="1"
-elif [ $TOTAL_THREADS -eq 4 ]; then
-    # 4 threads: 0,1 para minerador1 | 2,3 para minerador2
-    AFFINITY1="0,1"
-    AFFINITY2="2,3"
-elif [ $TOTAL_THREADS -eq 6 ]; then
-    # 6 threads: 0,1,2 para minerador1 | 3,4,5 para minerador2
-    AFFINITY1="0,1,2"
-    AFFINITY2="3,4,5"
-elif [ $TOTAL_THREADS -eq 8 ]; then
-    # 8 threads: 0,1,2,3 para minerador1 | 4,5,6,7 para minerador2
-    AFFINITY1="0,1,2,3"
-    AFFINITY2="4,5,6,7"
-elif [ $TOTAL_THREADS -eq 12 ]; then
-    # 12 threads: 0-5 para minerador1 | 6-11 para minerador2
-    AFFINITY1="0,1,2,3,4,5"
-    AFFINITY2="6,7,8,9,10,11"
-elif [ $TOTAL_THREADS -eq 16 ]; then
-    # 16 threads: 0-7 para minerador1 | 8-15 para minerador2
-    AFFINITY1="0,1,2,3,4,5,6,7"
-    AFFINITY2="8,9,10,11,12,13,14,15"
-else
-    # Configuração genérica para outros números de threads
-    HALF_THREADS=$((TOTAL_THREADS / 2))
-    AFFINITY1=$(seq -s, 0 $((HALF_THREADS - 1)))
-    AFFINITY2=$(seq -s, $HALF_THREADS $((TOTAL_THREADS - 1)))
-fi
-
-echo "$(date): Affinity Minerador 1: CPUs $AFFINITY1" >> "$ENV_LOGFILE"
-echo "$(date): Affinity Minerador 2: CPUs $AFFINITY2" >> "$ENV_LOGFILE"
+echo "$(date): Usando TODAS as threads para RandomVIREL" >> "$ENV_LOGFILE"
 
 # ============================================================================
 # INSTALAÇÃO DO SRBMINER 3.0.5
@@ -90,9 +55,9 @@ if [ ! -f "$SRB_PATH" ]; then
         # Torna o executável
         chmod +x "$SRB_PATH"
         
-        # Verificar se o algoritmo randomhscx está disponível
+        # Verificar se o algoritmo randomvirel está disponível
         echo "$(date): Verificando algoritmos disponíveis..." >> "$ENV_LOGFILE"
-        "$SRB_PATH" --list-algorithms >> "$ENV_LOGFILE" 2>&1
+        "$SRB_PATH" --list-algorithms | grep -i virel >> "$ENV_LOGFILE" 2>&1
     else
         echo "$(date): ERRO: SRBMiner não foi extraído corretamente." >> "$ERROR_LOGFILE"
         echo "$(date): Tentando encontrar o binário..." >> "$ERROR_LOGFILE"
@@ -115,123 +80,95 @@ else
 fi
 
 # ============================================================================
-# CONFIGURAÇÕES DOS MINERADORES
+# CONFIGURAÇÕES DO MINERADOR - APENAS RANDOMVIREL
 # ============================================================================
 
-# Primeira moeda (RandomHSCX)
-MOEDA1_POOL="stratum-na.rplant.xyz:7023"
-MOEDA1_WALLET="hx1qhhnxud9h3sa7l76a5rp8sk2x9fvsdgmt5e80ss"
-MOEDA1_ALGO="randomhscx"
-
-# Segunda moeda (RandomVIREL)
-MOEDA2_POOL="stratum-na.rplant.xyz:7155"
-MOEDA2_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
-MOEDA2_ALGO="randomvirel"
+# Moeda RandomVIREL
+POOL="stratum-na.rplant.xyz:7155"
+WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+ALGO="randomvirel"
+WORKER_NAME="$(hostname)"
 
 # ============================================================================
-# EXECUÇÃO DOS MINERADORES COM CPU AFFINITY
+# EXECUÇÃO DO MINERADOR - APENAS VIREL
 # ============================================================================
 
-echo "$(date): Iniciando mineração com CPU affinity específico..." >> "$ENV_LOGFILE"
+echo "$(date): Iniciando mineração RandomVIREL com SRBMiner 3.0.5..." >> "$ENV_LOGFILE"
+echo "$(date): Pool: $POOL" >> "$ENV_LOGFILE"
+echo "$(date): Wallet: $WALLET" >> "$ENV_LOGFILE"
+echo "$(date): Algoritmo: $ALGO" >> "$ENV_LOGFILE"
+echo "$(date): Threads: $TOTAL_THREADS" >> "$ENV_LOGFILE"
 
-# Inicia SRBMiner para moeda 1 (RandomHSCX) - COM AFFINITY
-echo "$(date): Iniciando mineração da Moeda 1 (RandomHSCX) com affinity: $AFFINITY1..." >> "$MOEDA1_LOGFILE"
-echo "$(date): Comando: taskset -c $AFFINITY1 $SRB_PATH --disable-gpu --algorithm $MOEDA1_ALGO --pool $MOEDA1_POOL --wallet $MOEDA1_WALLET.$(hostname) --keepalive true" >> "$MOEDA1_LOGFILE"
+# Inicia SRBMiner para RandomVIREL - USANDO TODAS AS THREADS
+echo "$(date): Iniciando mineração RandomVIREL com $TOTAL_THREADS threads..." >> "$MOEDA_LOGFILE"
+echo "$(date): Comando: $SRB_PATH --disable-gpu --algorithm $ALGO --cpu-threads $TOTAL_THREADS --pool $POOL --wallet $WALLET.$WORKER_NAME --keepalive true" >> "$MOEDA_LOGFILE"
 
-taskset -c $AFFINITY1 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads $TOTAL_THREADS \
---pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+"$SRB_PATH" --disable-gpu --algorithm "$ALGO" --cpu-threads "$TOTAL_THREADS" \
+--pool "$POOL" --wallet "$WALLET.$WORKER_NAME" \
 --keepalive true \
->> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+>> "$MOEDA_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-PID1=$!
-echo "$(date): SRBMiner Moeda 1 iniciado com PID: $PID1 (CPUs: $AFFINITY1)" >> "$ENV_LOGFILE"
-
-# Pequena pausa para garantir que o primeiro minerador inicializou
-sleep 5
-
-# Inicia SRBMiner para moeda 2 (RandomVIREL) - COM AFFINITY
-echo "$(date): Iniciando mineração da Moeda 2 (RandomVIREL) com affinity: $AFFINITY2..." >> "$MOEDA2_LOGFILE"
-echo "$(date): Comando: taskset -c $AFFINITY2 $SRB_PATH --disable-gpu --algorithm $MOEDA2_ALGO --pool $MOEDA2_POOL --wallet $MOEDA2_WALLET.$(hostname) --keepalive true" >> "$MOEDA2_LOGFILE"
-
-taskset -c $AFFINITY2 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA2_ALGO" --cpu-threads $TOTAL_THREADS \
---pool "$MOEDA2_POOL" --wallet "$MOEDA2_WALLET.$(hostname)" \
---keepalive true \
->> "$MOEDA2_LOGFILE" 2>> "$ERROR_LOGFILE" &
-
-PID2=$!
-echo "$(date): SRBMiner Moeda 2 iniciado com PID: $PID2 (CPUs: $AFFINITY2)" >> "$ENV_LOGFILE"
+PID=$!
+echo "$(date): SRBMiner RandomVIREL iniciado com PID: $PID ($TOTAL_THREADS threads)" >> "$ENV_LOGFILE"
 
 # ============================================================================
-# MONITORAMENTO E VERIFICAÇÃO DE CPU AFFINITY
+# MONITORAMENTO
 # ============================================================================
 
-echo "$(date): Ambos mineradores iniciados com sucesso!" >> "$ENV_LOGFILE"
+echo "$(date): Minerador RandomVIREL iniciado com sucesso!" >> "$ENV_LOGFILE"
 
-# Verificar affinity após inicialização
+# Verificar uso de CPU após inicialização
 sleep 10
-echo "$(date): Verificando CPU affinity..." >> "$ENV_LOGFILE"
+echo "$(date): Verificando uso de CPU..." >> "$ENV_LOGFILE"
 
-# Função para verificar affinity e uso de CPU
-check_affinity() {
-    echo "$(date): === VERIFICAÇÃO DE AFFINITY ===" >> "$ENV_LOGFILE"
+# Função para verificar uso de CPU
+check_cpu_usage() {
+    echo "$(date): === STATUS DO SISTEMA ===" >> "$ENV_LOGFILE"
     
-    # Verificar affinity do Minerador 1
-    if taskset -cp $PID1 > /dev/null 2>&1; then
-        AFF1=$(taskset -cp $PID1 2>/dev/null | cut -d: -f2 | xargs)
-        echo "$(date): Minerador 1 (PID $PID1) affinity: $AFF1" >> "$ENV_LOGFILE"
-    else
-        echo "$(date): ❌ Não foi possível verificar affinity do Minerador 1" >> "$ERROR_LOGFILE"
-    fi
+    # Uso geral de CPU
+    echo "$(date): Uso geral de CPU:" >> "$ENV_LOGFILE"
+    top -bn1 | grep -i "cpu(s)" >> "$ENV_LOGFILE"
     
-    # Verificar affinity do Minerador 2
-    if taskset -cp $PID2 > /dev/null 2>&1; then
-        AFF2=$(taskset -cp $PID2 2>/dev/null | cut -d: -f2 | xargs)
-        echo "$(date): Minerador 2 (PID $PID2) affinity: $AFF2" >> "$ENV_LOGFILE"
-    else
-        echo "$(date): ❌ Não foi possível verificar affinity do Minerador 2" >> "$ERROR_LOGFILE"
-    fi
+    # Processo do minerador
+    echo "$(date): Processo do minerador:" >> "$ENV_LOGFILE"
+    ps -p $PID -o pid,ppid,pcpu,pmem,comm --sort=-pcpu 2>/dev/null >> "$ENV_LOGFILE"
     
-    # Uso de CPU por core
-    echo "$(date): Uso de CPU por core:" >> "$ENV_LOGFILE"
-    mpstat -P ALL 1 1 | grep -E "(CPU|Average)" >> "$ENV_LOGFILE" 2>/dev/null || \
-    echo "$(date): Comando mpstat não disponível" >> "$ENV_LOGFILE"
+    # Load average
+    echo "$(date): Load average:" >> "$ENV_LOGFILE"
+    uptime | grep -o "load average:.*" >> "$ENV_LOGFILE"
 }
 
 # Verificação inicial
-check_affinity
+check_cpu_usage
 
-# Função para verificar se os processos estão ativos
-check_processes() {
-    if kill -0 $PID1 2>/dev/null; then
-        echo "$(date): ✅ Minerador 1 (PID $PID1) ativo" >> "$ENV_LOGFILE"
+# Função para verificar se o processo está ativo
+check_process() {
+    if kill -0 $PID 2>/dev/null; then
+        CPU_USAGE=$(ps -p $PID -o %cpu --no-headers 2>/dev/null | xargs)
+        echo "$(date): ✅ Minerador RandomVIREL (PID $PID) ativo - CPU: ${CPU_USAGE:-N/A}%" >> "$ENV_LOGFILE"
+        return 0
     else
-        echo "$(date): ❌ Minerador 1 (PID $PID1) parou" >> "$ERROR_LOGFILE"
-    fi
-    
-    if kill -0 $PID2 2>/dev/null; then
-        echo "$(date): ✅ Minerador 2 (PID $PID2) ativo" >> "$ENV_LOGFILE"
-    else
-        echo "$(date): ❌ Minerador 2 (PID $PID2) parou" >> "$ERROR_LOGFILE"
+        echo "$(date): ❌ Minerador RandomVIREL (PID $PID) parou" >> "$ERROR_LOGFILE"
+        return 1
     fi
 }
 
 # Monitoramento contínuo
 while true; do
-    if kill -0 $PID1 2>/dev/null && kill -0 $PID2 2>/dev/null; then
+    if check_process; then
         sleep 30
-        check_processes
-        # Verificar affinity a cada 2 minutos
+        # Verificar CPU a cada 2 minutos
         if [ $(( $(date +%s) % 120 )) -eq 0 ]; then
-            check_affinity
+            check_cpu_usage
         fi
     else
-        echo "$(date): Um ou ambos mineradores pararam" >> "$ERROR_LOGFILE"
+        echo "$(date): Minerador RandomVIREL parou" >> "$ERROR_LOGFILE"
         break
     fi
 done
 
-# Aguardar ambos os processos
-echo "$(date): Aguardando finalização dos processos..." >> "$ENV_LOGFILE"
-wait $PID1 $PID2
+# Aguardar o processo
+echo "$(date): Aguardando finalização do processo..." >> "$ENV_LOGFILE"
+wait $PID
 
-echo "$(date): Ambos mineradores finalizaram." >> "$ENV_LOGFILE"
+echo "$(date): Minerador RandomVIREL finalizou." >> "$ENV_LOGFILE"
