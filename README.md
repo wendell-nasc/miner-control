@@ -1,4 +1,55 @@
 <!-- markdownlint-disable -->
+
+# TEMPERATURA PROCESSADORES AMD E INTEL
+echo $(( $(cat /sys/class/thermal/thermal_zone0/temp) / 1000 ))°
+
+- AMD
+sudo apt install lm-sensors -y
+sudo sensors-detect
+sensors
+sensors | grep -E "Tctl|Tdie|temp1"
+ou
+sensors | grep -i cpu
+
+
+rig150-dell-i524000 - 90
+rig151-mini-e31220 - 27
+rig152-lenovo-i5-2500k - 89
+rig153-mini-cima-i5-3570 - 27
+rig154-giga-quarto-i7-3770 - 27
+rig155-pegatron-i5-2400 - 99
+rig156-pegatron-i52400 - 78
+rig157-giga-i7-3770 - 27
+rig158-qbex-i73770 - 27
+rig159-giga-fx6300 - +78.6°C  (high = +70.0°C)
+rig160-giga-i7-3770 - 27
+rig161-ipchal-azul-i5-2400 - 27
+rig162-asus-fx6300: -  +81.4°C  (high = +70.0°C)
+rig164-mini-i5-3470s - 27
+rig165-dell-i5-3570 - 27
+rig167-ipchazul1i7-2600k - 27
+rig168-asus-i7-3770 - 99
+rig169-pcware2-i5-3570s	- 27
+rig170-asus-e31275v2 - 27
+rig171-asus-e3-1225v2 - 27
+rig172-mini-i5-3570-direita - 27
+rig173-pcware-i5-3470 - 27
+rig174-giga-fx8320 -  +77.4°C  (high = +70.0°C)
+rig179-foxcon-i5-3570 - 27 
+rig186-giga-fx8320-janela -   +77.2°C  (high = +70.0°C)
+rig67-asus-e3-1270	- 27    
+
+
+
+echo $(( $(cat /sys/class/thermal/thermal_zone0/temp) / 1000 ))°
+
+
+
+
+
+
+
+
 sudo nano /etc/systemd/system/start-xdag_gustavo.sh                                     
 sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service  && sudo systemctl start xdag_gustavo.service 
 sudo EDITOR=nano crontab -e
