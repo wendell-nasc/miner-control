@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+# Caminho dos logs
 # Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
 MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
@@ -24,55 +24,52 @@ TOTAL_THREADS=$(nproc)
 THREADS1=$((TOTAL_THREADS / 2))
 THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-# Caminho do binário SRBMiner
-XMRIG_PATH="/opt/xmrig/xmrig"
+# Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-9-8/SRBMiner-MULTI"
 
+# Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+if [ ! -f "$SRB_PATH" ]; then
+    echo "SRBMiner não encontrado. Baixando versão 2.9.8..." >> "$ERROR_LOGFILE"
+    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
+    
+    # Remove versões antigas se existirem
+    rm -rf SRBMiner-Multi-* srbminer_custom-*
+    
+    # Baixa a versão mais recente 2.9.8
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
+    
+    # Extrai o arquivo
+    tar -xvf SRBMiner-Multi-2-9-8-Linux.tar.gz
+    
+    # Verifica se a extração foi bem sucedida
+    if [ -f "$SRB_PATH" ]; then
+        echo "SRBMiner 2.9.8 baixado e extraído com sucesso." >> "$ENV_LOGFILE"
+        # Torna o executável
+        chmod +x "$SRB_PATH"
+    else
+        echo "ERRO: SRBMiner não foi extraído corretamente." >> "$ERROR_LOGFILE"
+        echo "Tentando encontrar o binário..." >> "$ERROR_LOGFILE"
+        # Tenta encontrar o binário em subdiretórios
+        find /home/wendell/SRBMiner -name "srbminer*" -type f -executable >> "$ERROR_LOGFILE" 2>&1
+        exit 1
+    fi
+else
+    echo "SRBMiner 2.9.8 já está instalado." >> "$ENV_LOGFILE"
+fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="pool.supportxmr.com:3333"
-MOEDA1_WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
-MOEDA1_ALGO="rx/0"
-XMRIG_CONFIG="/opt/xmrig/config.json"
+MOEDA1_POOL="stratum-na.rplant.xyz:7155"
+MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
+#MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
+MOEDA1_ALGO="randomvirel"
 
-
-# Gera config do XMRig
-cat > "$XMRIG_CONFIG" <<EOL
-{
-    "name": "Tari RandomX pool",
-    "isFavorite": false,
-    "items": [
-        {
-            "coin": "tari",
-            "pool_ssl": false,
-            "wal_id": 10822236,
-            "dpool_ssl": false,
-            "miner": "xmrig-new",
-            "miner_alt": "xmrig",
-            "miner_config": {
-                "cpu": "1",
-                "url": "pool.supportxmr.com:3333",
-                "algo": "rx/0",
-                "fork": "xmrig",
-                "pass": "x",
-                "template": "%WAL%.%WORKER_NAME%",
-                "hugepages": "1248",
-                "cpu_config": "\"cpu\": {\n  \"huge-pages\": true,\n  \"hw-aes\": null,\n  \"priority\": null,\n  \"memory-pool\": false,\n  \"asm\": true\n}",
-                "user_config": "\"donate-level\": 1"
-            },
-            "pool_geo": []
-        }
-    ]
-}
-EOL
-
-chmod 644 "$XMRIG_CONFIG"
-
-# Inicia SRBMiner para moeda 1
-echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
-nice -n -20 "$XMRIG_PATH"  -o "$MOEDA1_POOL" -u "$MOEDA1_WALLET.$(hostname)" \
-  --algo="$MOEDA1_ALGO" --donate-level=1 --threads="$TOTAL_THREADS" --config="$XMRIG_CONFIG" \
-  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+# Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
+echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
+"$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads "$TOTAL_THREADS" \
+--pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+--keepalive true \
+>> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
-echo "$(date): Ambos mineradores iniciados com sucesso."
+echo "$(date): Ambos mineradores iniciados com sucesso com SRBMiner 2.9.8." >> "$ENV_LOGFILE"
