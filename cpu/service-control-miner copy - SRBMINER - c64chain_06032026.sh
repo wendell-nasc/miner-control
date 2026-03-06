@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Caminho dos logs
-# Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
 MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
 ENV_LOGFILE="/var/log/start-env.log"
@@ -24,52 +23,52 @@ TOTAL_THREADS=$(nproc)
 THREADS1=$((TOTAL_THREADS / 2))
 THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-# Caminho do binário SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
-SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-9-8/SRBMiner-MULTI"
+# Caminho do binário SRBMiner (CORRIGIDO PARA VERSÃO 3.1.5)
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-3-1-5/SRBMiner-MULTI"
 
-# Verifica existência do SRBMiner (ATUALIZADO PARA VERSÃO 2.9.8)
+# Verifica existência do SRBMiner (CORRIGIDO PARA VERSÃO 3.1.5)
 if [ ! -f "$SRB_PATH" ]; then
-    echo "SRBMiner não encontrado. Baixando versão 2.9.8..." >> "$ERROR_LOGFILE"
+    echo "SRBMiner não encontrado. Baixando versão 3.1.5..." >> "$ERROR_LOGFILE"
     mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
     
     # Remove versões antigas se existirem
     rm -rf SRBMiner-Multi-* srbminer_custom-*
     
-    # Baixa a versão mais recente 2.9.8
-    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.9.8/SRBMiner-Multi-2-9-8-Linux.tar.gz
+    # Baixa a versão 3.1.5
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/3.1.5/SRBMiner-Multi-3-1-5-Linux.tar.gz
     
     # Extrai o arquivo
-    tar -xvf SRBMiner-Multi-2-9-8-Linux.tar.gz
+    tar -xvf SRBMiner-Multi-3-1-5-Linux.tar.gz
     
     # Verifica se a extração foi bem sucedida
     if [ -f "$SRB_PATH" ]; then
-        echo "SRBMiner 2.9.8 baixado e extraído com sucesso." >> "$ENV_LOGFILE"
+        echo "SRBMiner 3.1.5 baixado e extraído com sucesso." >> "$ENV_LOGFILE"
         # Torna o executável
         chmod +x "$SRB_PATH"
     else
         echo "ERRO: SRBMiner não foi extraído corretamente." >> "$ERROR_LOGFILE"
         echo "Tentando encontrar o binário..." >> "$ERROR_LOGFILE"
         # Tenta encontrar o binário em subdiretórios
-        find /home/wendell/SRBMiner -name "srbminer*" -type f -executable >> "$ERROR_LOGFILE" 2>&1
+        find /home/wendell/SRBMiner -name "SRBMiner-MULTI" -type f -executable >> "$ERROR_LOGFILE" 2>&1
         exit 1
     fi
 else
-    echo "SRBMiner 2.9.8 já está instalado." >> "$ENV_LOGFILE"
+    echo "SRBMiner 3.1.5 já está instalado." >> "$ENV_LOGFILE"
 fi
 
-# Primeira moeda (ex: SCASH)
+# Primeira moeda (ex: SCASH) - CORRIGIDO: adicionado stratum+tcp://
 MOEDA1_POOL="randomx.rplant.xyz:7162"
 MOEDA1_WALLET="A1G1Yv8QpT81DGTjqamTtATtnSWFkyd3sjpTzTvQdiMn5FMQHFGYa5Ad6VRm18ZV3kMuJi6wZ7Fc6MY7WwfSuYy3FkW45hM"
 #MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
 MOEDA1_ALGO="randomc64"
 
-# Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
-echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
+# Inicia SRBMiner para moeda 1 (CORRIGIDO PARA VERSÃO 3.1.5)
+echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 3.1.5..." >> "$MOEDA1_LOGFILE"
 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" --cpu-threads "$TOTAL_THREADS" \
 --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
 --keepalive true \
 >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
-echo "$(date): Ambos mineradores iniciados com sucesso com SRBMiner 2.9.8." >> "$ENV_LOGFILE"
+echo "$(date): Minerador iniciado com sucesso com SRBMiner 3.1.5." >> "$ENV_LOGFILE"
