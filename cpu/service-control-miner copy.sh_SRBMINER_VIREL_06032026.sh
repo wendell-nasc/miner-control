@@ -58,11 +58,11 @@ else
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="randomx.rplant.xyz:7162"
-MOEDA1_WALLET="A1G1Yv8QpT81DGTjqamTtATtnSWFkyd3sjpTzTvQdiMn5FMQHFGYa5Ad6VRm18ZV3kMuJi6wZ7Fc6MY7WwfSuYy3FkW45hM"
+MOEDA1_POOL="stratum-na.rplant.xyz:7155"
+MOEDA1_WALLET="v1em8ehwjlda71d98crfii0glji3rtdjboejdqe"
 #MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
-MOEDA1_ALGO="randomc64"
+MOEDA1_ALGO="randomvirel"
 
 # Inicia SRBMiner para moeda 1 (ATUALIZADO PARA VERSÃO 2.9.8 - SEM NICE)
 echo "$(date): Iniciando mineração da Moeda 1 com SRBMiner 2.9.8..." >> "$MOEDA1_LOGFILE"
