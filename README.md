@@ -1,3 +1,20 @@
+
+
+# Logs do systemd (mais detalhados)
+sudo journalctl -u xdag_gustavo.service -n 100 --no-pager
+
+# Logs com timeline
+sudo journalctl -u xdag_gustavo.service --since "5 minutes ago"
+
+# Ver apenas erros
+sudo journalctl -u xdag_gustavo.service -p err -b
+
+# Ver logs em tempo real
+sudo journalctl -u xdag_gustavo.service -f
+
+
+
+
 <!-- markdownlint-disable -->
 
 # TEMPERATURA PROCESSADORES AMD E INTEL
@@ -205,7 +222,8 @@ systemctl restart xdag_gustavo.service
 
 
 
-sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+sudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.servicesudo systemctl daemon-reload && sudo systemctl stop xdag_gustavo.service && sudo systemctl restart xdag_gustavo.service
+
 
 # CONTROL
 

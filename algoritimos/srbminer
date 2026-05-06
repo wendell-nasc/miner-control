@@ -1,0 +1,7 @@
+
+wendell@wendell-To-be-filled-by-O-E-M:~$ 
+
+ /home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --algorithm randomscash --pool eu.rplant.xyz:17019 --tls true --wallet scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u --keepalive true
+
+
+ /home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --algorithm randomscash --pool eu.rplant.xyz:17019 --tls true --wallet v1em8ehwjlda71d98crfii0glji3rtdjboejdqe --keepalive true   
