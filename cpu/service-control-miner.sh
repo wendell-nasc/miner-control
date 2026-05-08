@@ -41,7 +41,7 @@ MOEDA1_POOL="stratum-na.rplant.xyz:7019"
 MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
 MOEDA1_ALGO="randomscash"
 
-
+#novo
 # Inicia SRBMiner para moeda 1
 echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
 nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
