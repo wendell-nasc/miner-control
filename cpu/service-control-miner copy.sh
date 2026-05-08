@@ -57,8 +57,10 @@ else
 fi
 
 # Primeira moeda (ex: SCASH) - CORRIGIDO: adicionado stratum+tcp://
-MOEDA1_POOL="randomx.rplant.xyz:7162"
-MOEDA1_WALLET="A1G1Yv8QpT81DGTjqamTtATtnSWFkyd3sjpTzTvQdiMn5FMQHFGYa5Ad6VRm18ZV3kMuJi6wZ7Fc6MY7WwfSuYy3FkW45hM"
+MOEDA1_POOL="stratum-na.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+MOEDA1_POOL="randomx.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
 #MOEDA1_WALLET="v71r1cztjuyep18ooyh5zojarziur4mdf22lk8"
 
 MOEDA1_ALGO="randomc64"
