@@ -37,9 +37,9 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="br.zephyr.herominers.com:1123"
-MOEDA1_WALLET="ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c"
-MOEDA1_ALGO="randomx"
+MOEDA1_POOL="stratum-na.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+MOEDA1_ALGO="randomscash"
 
 #novo
 # Inicia SRBMiner para moeda 1
