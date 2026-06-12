@@ -37,7 +37,7 @@ if [ ! -f "$SRB_PATH" ]; then
 fi
 
 # Primeira moeda (ex: SCASH)
-MOEDA1_POOL="br.qrl.gfwroute.com:1166"
+MOEDA1_POOL="br.qrl.herominers.com:1166"
 MOEDA1_WALLET="Q0105004c5fde633090f2cfa0dcd301547b8a6a39429f56c5a01705cc9359def9aee34fcdc9d18e"
 MOEDA1_ALGO="randomx"
 

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# =========================
+# LOGS
+# =========================
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
+
+# Cria logs se não existirem
+for logfile in "$MOEDA1_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+    touch "$logfile"
+    chmod 644 "$logfile"
+done
+
+echo "========================================" >> "$ENV_LOGFILE"
+echo "$(date): Iniciando script" >> "$ENV_LOGFILE"
+
+# =========================
+# CPU
+# =========================
+TOTAL_THREADS=$(nproc)
+
+echo "$(date): Threads detectadas: $TOTAL_THREADS" >> "$ENV_LOGFILE"
+
+# =========================
+# SRBMINER 3.1.5
+# =========================
+SRB_BASE="/home/wendell/SRBMiner"
+SRB_PATH="$SRB_BASE/SRBMiner-Multi-3-1-5/SRBMiner-MULTI"
+
+# =========================
+# INSTALAÇÃO AUTOMÁTICA
+# =========================
+if [ ! -f "$SRB_PATH" ]; then
+
+    echo "$(date): SRBMiner não encontrado. Instalando versão 3.1.5..." >> "$ERROR_LOGFILE"
+
+    mkdir -p "$SRB_BASE"
+    cd "$SRB_BASE" || exit 1
+
+    rm -rf SRBMiner-Multi-*
+
+    wget -O SRBMiner-Multi-3-1-5-Linux.tar.gz \
+    https://github.com/doktor83/SRBMiner-Multi/releases/download/3.1.5/SRBMiner-Multi-3-1-5-Linux.tar.gz
+
+    tar -xzf SRBMiner-Multi-3-1-5-Linux.tar.gz
+
+    chmod +x "$SRB_PATH"
+
+    if [ ! -f "$SRB_PATH" ]; then
+        echo "$(date): ERRO - Binário não encontrado após extração." >> "$ERROR_LOGFILE"
+        exit 1
+    fi
+
+    echo "$(date): SRBMiner 3.1.5 instalado com sucesso." >> "$ENV_LOGFILE"
+fi
+
+# =========================
+# CONFIGURAÇÃO ZEPHYR
+# =========================
+POOL="br.zephyr.herominers.com:1123"
+
+WALLET="ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c"
+
+WORKER="$(hostname)"
+
+ALGO="randomx"
+
+# =========================
+# LOG
+# =========================
+echo "$(date): Iniciando SRBMiner..." >> "$MOEDA1_LOGFILE"
+echo "$(date): Host: $WORKER" >> "$MOEDA1_LOGFILE"
+echo "$(date): Threads: $TOTAL_THREADS" >> "$MOEDA1_LOGFILE"
+
+# =========================
+# EXECUÇÃO
+# =========================
+exec "$SRB_PATH" \
+    --disable-gpu \
+    --algorithm "$ALGO" \
+    --pool "$POOL" \
+    --wallet "$WALLET.$WORKER" \
+    --cpu-threads "$TOTAL_THREADS" \
+    --cpu-threads-priority 5 \
+    --keepalive true \
+    --log-file "$MOEDA1_LOGFILE"
