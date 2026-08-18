@@ -39,20 +39,21 @@ fi
 # Primeira moeda (ex: SCASH)
 MOEDA1_POOL="br.qrl.herominers.com:1166"
 MOEDA1_WALLET="Q0105004c5fde633090f2cfa0dcd301547b8a6a39429f56c5a01705cc9359def9aee34fcdc9d18e"
-
-
+MOEDA1_ALGO="randomx"
 
 #novo
 # Inicia SRBMiner para moeda 1
 echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
-nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
-  --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  --cpu-threads-priority 5 --keepalive true \
+nice -n -20 "$SRB_PATH" \
+  --disable-gpu \
+  --algorithm "$MOEDA1_ALGO" \
+  --pool "$MOEDA1_POOL" \
+  --wallet "$MOEDA1_WALLET.$(hostname)" \
+  --cpu-threads "$TOTAL_THREADS" \
+  --cpu-threads-priority 5 \
+  --keepalive true \
   >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 wait
+#/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI --disable-gpu --algorithm randomx --pool br.zephyr.herominers.com:1123 --wallet ZEPHYR2Gz72Xzthz6gY3d7hSRWryxyhmEJK6RZhebDjqfYb34c3rHiSH2zZKTkgWdd4osMTcX6EGHZkpBDPbS8nrL4gq8DsefM72c.$(hostname) --cpu-threads $(nproc) --cpu-threads-priority 5 --keepalive true
 echo "$(date): Ambos mineradores iniciados com sucesso."
-
-
-
