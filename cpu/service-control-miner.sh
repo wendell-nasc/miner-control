@@ -92,7 +92,7 @@ nice -n -20 "$XMRIG_PATH" \
     --tls-fingerprint="$TLS_FINGERPRINT" \
     --threads="$TOTAL_THREADS" \
     --huge-pages \
-    --donate-level=1 \
+    --donate-level=0 \
     >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
 XMRIG_PID=$!
