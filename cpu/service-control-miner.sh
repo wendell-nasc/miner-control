@@ -1,54 +1,112 @@
 #!/bin/bash
 
+# ============================================================
+# XMRig - Monero / RandomX / HashVault
+# ============================================================
 
 # Caminho dos logs
 MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
-MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
 ENV_LOGFILE="/var/log/start-env.log"
 ERROR_LOGFILE="/var/log/error.log"
 
+# Caminho do XMRig
+XMRIG_PATH="/opt/xmrig/xmrig"
+
+# Wallet Monero
+MOEDA1_WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
+
+# Worker / senha
+MOEDA1_PASS="$(hostname)"
+
+# Algoritmo Monero
+MOEDA1_ALGO="rx/0"
+
+# Pools HashVault
+MOEDA1_POOL1="pool.hashvault.pro:443"
+MOEDA1_POOL2="pool.hashvault.sh:443"
+
+# TLS
+TLS_FINGERPRINT="420c7850e09b7c0bdcf748a7da9eb3647daf8515718f36d9ccfdd6b9ff834b14"
+
+# Número total de threads
+TOTAL_THREADS=$(nproc)
+
+# ============================================================
 # Criar arquivos de log
-for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+# ============================================================
+
+for logfile in "$MOEDA1_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
     touch "$logfile"
     chmod 644 "$logfile"
 done
 
-# Exporta PATH
+# ============================================================
+# PATH
+# ============================================================
+
 export PATH="$PATH"
 
-# Log de variáveis de ambiente
+# ============================================================
+# Registrar ambiente
+# ============================================================
+
 env >> "$ENV_LOGFILE"
 
-# Threads
-TOTAL_THREADS=$(nproc)
-THREADS1=$((TOTAL_THREADS / 2))
-THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
+# ============================================================
+# Informações iniciais
+# ============================================================
 
-# Caminho do binário SRBMiner
-SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
+echo "============================================================" >> "$MOEDA1_LOGFILE"
+echo "$(date): Iniciando XMRig" >> "$MOEDA1_LOGFILE"
+echo "$(date): Hostname: $(hostname)" >> "$MOEDA1_LOGFILE"
+echo "$(date): CPU threads: $TOTAL_THREADS" >> "$MOEDA1_LOGFILE"
+echo "$(date): Algoritmo: $MOEDA1_ALGO" >> "$MOEDA1_LOGFILE"
+echo "$(date): Pool principal: $MOEDA1_POOL1" >> "$MOEDA1_LOGFILE"
+echo "$(date): Pool failover: $MOEDA1_POOL2" >> "$MOEDA1_LOGFILE"
+echo "============================================================" >> "$MOEDA1_LOGFILE"
 
-# Verifica existência do SRBMiner
-if [ ! -f "$SRB_PATH" ]; then
-    echo "SRBMiner não encontrado. Baixando..." >> "$ERROR_LOGFILE"
-    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
-    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
-    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz
-    echo "SRBMiner baixado com sucesso." >> "$ENV_LOGFILE"
+# ============================================================
+# Verificar XMRig
+# ============================================================
+
+if [ ! -x "$XMRIG_PATH" ]; then
+    echo "$(date): ERRO - XMRig não encontrado em $XMRIG_PATH" >> "$ERROR_LOGFILE"
+    exit 1
 fi
 
-# Primeira moeda (ex: SCASH)
-MOEDA1_POOL="stratum-na.rplant.xyz:7019"
-MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
-MOEDA1_ALGO="randomscash"
+# ============================================================
+# Iniciar XMRig
+# ============================================================
 
-#novo
-# Inicia SRBMiner para moeda 1
-echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
-nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
-  --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
-  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
-  --cpu-threads-priority 5 --keepalive true \
-  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
+nice -n -20 "$XMRIG_PATH" \
+    --algo="$MOEDA1_ALGO" \
+    --url="$MOEDA1_POOL1" \
+    --user="$MOEDA1_WALLET" \
+    --pass="$MOEDA1_PASS" \
+    --tls \
+    --tls-fingerprint="$TLS_FINGERPRINT" \
+    --url="$MOEDA1_POOL2" \
+    --user="$MOEDA1_WALLET" \
+    --pass="$MOEDA1_PASS" \
+    --tls \
+    --tls-fingerprint="$TLS_FINGERPRINT" \
+    --threads="$TOTAL_THREADS" \
+    --huge-pages \
+    --donate-level=1 \
+    >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-wait
-echo "$(date): Ambos mineradores iniciados com sucesso."
+XMRIG_PID=$!
+
+echo "$(date): XMRig iniciado com PID $XMRIG_PID" >> "$MOEDA1_LOGFILE"
+
+# ============================================================
+# Aguardar processo
+# ============================================================
+
+wait "$XMRIG_PID"
+
+EXIT_CODE=$?
+
+echo "$(date): XMRig finalizado. Código: $EXIT_CODE" >> "$MOEDA1_LOGFILE"
+
+exit "$EXIT_CODE"
