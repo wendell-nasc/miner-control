@@ -1,267 +1,54 @@
-#!/bin/sh
+#!/bin/bash
 
-# ============================================================
-# XMRig - MONERO / RANDOMX / SUPPORTXMR
-# Compatível com SH e BASH
-# Intel / AMD
-# Worker automático pelo hostname
-# ============================================================
 
-set -u
+# Caminho dos logs
+MOEDA1_LOGFILE="/var/log/SRBMOEDA1.log"
+MOEDA2_LOGFILE="/var/log/SRBMOEDA2.log"
+ENV_LOGFILE="/var/log/start-env.log"
+ERROR_LOGFILE="/var/log/error.log"
 
-# ============================================================
-# CONFIGURAÇÕES
-# ============================================================
+# Criar arquivos de log
+for logfile in "$MOEDA1_LOGFILE" "$MOEDA2_LOGFILE" "$ENV_LOGFILE" "$ERROR_LOGFILE"; do
+    touch "$logfile"
+    chmod 644 "$logfile"
+done
 
-XMRIG_PATH="/opt/xmrig/xmrig"
-XMRIG_CONFIG="/opt/xmrig/config.json"
+# Exporta PATH
+export PATH="$PATH"
 
-LOGFILE="/var/log/SRBMOEDA1.log"
-ERROR_LOG="/var/log/error.log"
+# Log de variáveis de ambiente
+env >> "$ENV_LOGFILE"
 
-WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
+# Threads
+TOTAL_THREADS=$(nproc)
+THREADS1=$((TOTAL_THREADS / 2))
+THREADS2=$((TOTAL_THREADS - THREADS1)) # Garante que use todos os núcleos
 
-POOL="pool.supportxmr.com:443"
+# Caminho do binário SRBMiner
+SRB_PATH="/home/wendell/SRBMiner/SRBMiner-Multi-2-6-5/SRBMiner-MULTI"
 
-WORKER="$(hostname)"
-ASM="auto"
-
-# ============================================================
-# LOGS
-# ============================================================
-
-mkdir -p /opt/xmrig
-
-touch "$LOGFILE" "$ERROR_LOG"
-
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOGFILE"
-}
-
-error() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - ERRO: $1" >> "$ERROR_LOG"
-}
-
-# ============================================================
-# VERIFICAR XMRIG
-# ============================================================
-
-if [ ! -x "$XMRIG_PATH" ]; then
-    error "XMRig não encontrado: $XMRIG_PATH"
-    exit 1
+# Verifica existência do SRBMiner
+if [ ! -f "$SRB_PATH" ]; then
+    echo "SRBMiner não encontrado. Baixando..." >> "$ERROR_LOGFILE"
+    mkdir -p /home/wendell/SRBMiner && cd /home/wendell/SRBMiner || exit 1
+    wget https://github.com/doktor83/SRBMiner-Multi/releases/download/2.6.5/SRBMiner-Multi-2-6-5-Linux.tar.gz
+    tar -xvf SRBMiner-Multi-2-6-5-Linux.tar.gz
+    echo "SRBMiner baixado com sucesso." >> "$ENV_LOGFILE"
 fi
 
-# ============================================================
-# DETECTAR CPU
-# ============================================================
+# Primeira moeda (ex: SCASH)
+MOEDA1_POOL="stratum-na.rplant.xyz:7019"
+MOEDA1_WALLET="scash1qvv3wfql4lxy36mkpgx3032nm4pvqmlq00lye6u"
+MOEDA1_ALGO="randomscash"
 
-CPU_VENDOR="$(lscpu | awk -F: '/Vendor ID:/ {
-    gsub(/^[ \t]+|[ \t]+$/, "", $2);
-    print $2
-}')"
+#novo
+# Inicia SRBMiner para moeda 1
+echo "$(date): Iniciando mineração da Moeda 1..." >> "$MOEDA1_LOGFILE"
+nice -n -20 "$SRB_PATH" --disable-gpu --algorithm "$MOEDA1_ALGO" \
+  --pool "$MOEDA1_POOL" --wallet "$MOEDA1_WALLET.$(hostname)" \
+  #--cpu-threads "$TOTAL_THREADS" --cpu-threads-priority 5 --keepalive true \
+  --cpu-threads-priority 5 --keepalive true \
+  >> "$MOEDA1_LOGFILE" 2>> "$ERROR_LOGFILE" &
 
-CPU_MODEL="$(lscpu | awk -F: '/Model name:/ {
-    gsub(/^[ \t]+|[ \t]+$/, "", $2);
-    print $2
-}')"
-
-CPU_THREADS="$(nproc)"
-
-CPU_PHYSICAL="$(lscpu -p=CORE |
-    grep -v '^#' |
-    sort -u |
-    wc -l | tr -d ' ')"
-
-[ "$CPU_THREADS" -lt 1 ] && CPU_THREADS=1
-[ "$CPU_PHYSICAL" -lt 1 ] && CPU_PHYSICAL=1
-
-# ============================================================
-# DETECTAR ASM - SH COMPATÍVEL
-# ============================================================
-
-case "$CPU_VENDOR" in
-
-    GenuineIntel)
-        ASM="intel"
-        ;;
-
-    AuthenticAMD)
-
-        case "$CPU_MODEL" in
-
-            *FX-*|*Opteron*|*Bulldozer*|*Piledriver*|*Steamroller*|*Excavator*)
-                ASM="bulldozer"
-                ;;
-
-            *Ryzen*|*Threadripper*|*EPYC*)
-                ASM="ryzen"
-                ;;
-
-            *)
-                ASM="auto"
-                ;;
-        esac
-        ;;
-
-    *)
-        ASM="auto"
-        ;;
-esac
-
-# ============================================================
-# MOSTRAR CONFIGURAÇÃO
-# ============================================================
-
-echo
-echo "=================================================="
-echo "             XMRIG - SUPPORTXMR"
-echo "=================================================="
-echo "CPU.............: $CPU_MODEL"
-echo "Vendor..........: $CPU_VENDOR"
-echo "Cores físicos...: $CPU_PHYSICAL"
-echo "Threads.........: $CPU_THREADS"
-echo "ASM.............: $ASM"
-echo "Worker..........: $WORKER"
-echo "Carteira........: $(printf '%s' "$WALLET" | cut -c1-12)..."
-echo "Pool............: $POOL"
-echo "Algoritmo.......: rx/0"
-echo "TLS.............: Desativado"
-echo "=================================================="
-echo
-
-log "Iniciando XMRig - SupportXMR"
-log "CPU: $CPU_MODEL"
-log "Vendor: $CPU_VENDOR"
-log "Threads: $CPU_THREADS"
-log "ASM: $ASM"
-log "Worker: $WORKER"
-log "Pool: $POOL"
-
-# ============================================================
-# GERAR CONFIG.JSON
-# ============================================================
-
-export WALLET POOL WORKER ASM LOGFILE
-
-python3 <<'PY'
-
-import json
-import os
-
-config = {
-    "autosave": False,
-    "background": False,
-    "colors": True,
-    "title": True,
-
-    "randomx": {
-        "mode": "auto",
-        "1gb-pages": False,
-        "rdmsr": True,
-        "wrmsr": True,
-        "numa": True
-    },
-
-    "cpu": {
-        "enabled": True,
-        "huge-pages": True,
-        "priority": 2,
-        "yield": False,
-        "max-threads-hint": 100,
-        "asm": os.environ["ASM"]
-    },
-
-    "opencl": {
-        "enabled": False
-    },
-
-    "cuda": {
-        "enabled": False
-    },
-
-    "pools": [
-        {
-            "algo": "rx/0",
-            "coin": "monero",
-            "url": os.environ["POOL"],
-            "user": os.environ["WALLET"],
-            "pass": os.environ["WORKER"],
-            "keepalive": True,
-            "enabled": True,
-            "tls": False
-        }
-    ],
-
-    "retries": 10,
-    "retry-pause": 5,
-    "print-time": 60,
-    "health-print-time": 60,
-    "log-file": os.environ["LOGFILE"],
-    "donate-level": 0
-}
-
-path = "/opt/xmrig/config.json"
-
-with open(path, "w") as f:
-    json.dump(config, f, indent=4)
-
-print("Config gerado:", path)
-
-PY
-
-if [ "$?" -ne 0 ]; then
-    error "Falha ao gerar config.json"
-    exit 1
-fi
-
-# ============================================================
-# VALIDAR JSON
-# ============================================================
-
-if ! python3 -m json.tool "$XMRIG_CONFIG" > /dev/null 2>&1; then
-    error "Configuração JSON inválida"
-    exit 1
-fi
-
-log "Configuração JSON validada."
-
-# ============================================================
-# VALIDAR XMRIG
-# ============================================================
-
-echo
-echo "VALIDANDO CONFIGURAÇÃO XMRIG..."
-echo
-
-"$XMRIG_PATH" \
-    --config="$XMRIG_CONFIG" \
-    --dry-run \
-    >> "$LOGFILE" 2>> "$ERROR_LOG"
-
-RESULT=$?
-
-if [ "$RESULT" -ne 0 ]; then
-    error "XMRig rejeitou a configuração."
-    exit 1
-fi
-
-log "Dry-run concluído com sucesso."
-
-# ============================================================
-# INICIAR MINERAÇÃO
-# ============================================================
-
-echo
-echo "=================================================="
-echo "             MINERAÇÃO INICIADA"
-echo "=================================================="
-echo "Pool: $POOL"
-echo "Worker: $WORKER"
-echo "Threads: $CPU_THREADS"
-echo "ASM: $ASM"
-echo "=================================================="
-echo
-
-exec "$XMRIG_PATH" \
-    --config="$XMRIG_CONFIG" \
-    >> "$LOGFILE" 2>> "$ERROR_LOG"
+wait
+echo "$(date): Ambos mineradores iniciados com sucesso."
