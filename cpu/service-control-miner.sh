@@ -197,7 +197,7 @@ config = {
     "print-time": 60,
     "health-print-time": 60,
     "log-file": os.environ["LOGFILE"],
-    "donate-level": 1
+    "donate-level": 0
 }
 
 path = "/opt/xmrig/config.json"
