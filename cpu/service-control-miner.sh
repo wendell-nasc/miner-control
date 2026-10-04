@@ -21,7 +21,7 @@ ERROR_LOG="/var/log/error.log"
 
 WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
 
-POOL="xmr-br.kryptex.network:7029"
+POOL="pool.supportxmr.com:443"
 
 WORKER="$(hostname)"
 ASM="auto"
@@ -141,7 +141,7 @@ log "Pool: $POOL"
 # GERAR CONFIG.JSON
 # ============================================================
 
-export WALLET POOL WORKER ASM LOGFILE CPU_THREADS
+export WALLET POOL WORKER ASM LOGFILE
 
 python3 <<'PY'
 
@@ -194,8 +194,8 @@ config = {
 
     "retries": 10,
     "retry-pause": 5,
-    "print-time": 30,
-    "health-print-time": 30,
+    "print-time": 60,
+    "health-print-time": 60,
     "log-file": os.environ["LOGFILE"],
     "donate-level": 0
 }
@@ -262,25 +262,6 @@ echo "ASM: $ASM"
 echo "=================================================="
 echo
 
-# ============================================================
-# EXECUTAR XMRIG COM PARÂMETROS DO MODELO
-# ============================================================
-# Usa os mesmos parâmetros CLI do script modelo para
-# garantir que os logs apareçam no terminal E no arquivo
-# de log da mesma forma.
-# ============================================================
-
-exec nice -n -20 "$XMRIG_PATH" \
-    --url="$POOL" \
-    --user="$WALLET" \
-    --pass="$WORKER" \
-    --algo="rx/0" \
-    --donate-level=0 \
-    --threads="$CPU_THREADS" \
-    --huge-pages \
-    --asm="$ASM" \
-    --keepalive \
-    --no-color \
-    --verbose \
-    --print-time=30 \
+exec "$XMRIG_PATH" \
+    --config="$XMRIG_CONFIG" \
     >> "$LOGFILE" 2>> "$ERROR_LOG"

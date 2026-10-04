@@ -21,7 +21,7 @@ ERROR_LOG="/var/log/error.log"
 
 WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
 
-POOL="pool.supportxmr.com:3333"
+POOL="pool.supportxmr.com:443"
 
 WORKER="$(hostname)"
 ASM="auto"
