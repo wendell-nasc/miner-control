@@ -19,9 +19,12 @@ XMRIG_CONFIG="/opt/xmrig/config.json"
 LOGFILE="/var/log/SRBMOEDA1.log"
 ERROR_LOG="/var/log/error.log"
 
-WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
+# Dificuldade fixa 1000 anexada ao endereço da carteira
+WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy+1000"
 
-POOL="pool.supportxmr.com:443"
+# Porta 3333 = baixa dificuldade inicial + suporta dificuldade fixa via +N
+# NÃO usar TLS nesta porta (o sufixo +1000 só funciona sem TLS)
+POOL="pool.supportxmr.com:3333"
 
 WORKER="$(hostname)"
 ASM="auto"
@@ -31,7 +34,6 @@ ASM="auto"
 # ============================================================
 
 mkdir -p /opt/xmrig
-
 touch "$LOGFILE" "$ERROR_LOG"
 
 log() {
@@ -80,29 +82,22 @@ CPU_PHYSICAL="$(lscpu -p=CORE |
 # ============================================================
 
 case "$CPU_VENDOR" in
-
     GenuineIntel)
         ASM="intel"
         ;;
-
     AuthenticAMD)
-
         case "$CPU_MODEL" in
-
             *FX-*|*Opteron*|*Bulldozer*|*Piledriver*|*Steamroller*|*Excavator*)
                 ASM="bulldozer"
                 ;;
-
             *Ryzen*|*Threadripper*|*EPYC*)
                 ASM="ryzen"
                 ;;
-
             *)
                 ASM="auto"
                 ;;
         esac
         ;;
-
     *)
         ASM="auto"
         ;;
@@ -122,10 +117,11 @@ echo "Cores físicos...: $CPU_PHYSICAL"
 echo "Threads.........: $CPU_THREADS"
 echo "ASM.............: $ASM"
 echo "Worker..........: $WORKER"
-echo "Carteira........: $(printf '%s' "$WALLET" | cut -c1-12)..."
+echo "Carteira........: $(printf '%s' "$WALLET" | cut -c1-12)...+1000"
 echo "Pool............: $POOL"
 echo "Algoritmo.......: rx/0"
-echo "TLS.............: Desativado"
+echo "TLS.............: Desativado (porta 3333)"
+echo "Dificuldade.....: 1000 (fixa)"
 echo "=================================================="
 echo
 
@@ -136,6 +132,7 @@ log "Threads: $CPU_THREADS"
 log "ASM: $ASM"
 log "Worker: $WORKER"
 log "Pool: $POOL"
+log "Dificuldade: 1000"
 
 # ============================================================
 # GERAR CONFIG.JSON
@@ -259,6 +256,7 @@ echo "Pool: $POOL"
 echo "Worker: $WORKER"
 echo "Threads: $CPU_THREADS"
 echo "ASM: $ASM"
+echo "Dificuldade: 1000"
 echo "=================================================="
 echo
 
