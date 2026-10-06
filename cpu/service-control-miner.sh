@@ -1,10 +1,11 @@
+```bash
 #!/bin/sh
 
 # ============================================================
-# XMRig - MONERO / RANDOMX / SUPPORTXMR
-# Compatível com SH e BASH
+# XMRig - MONERO / RANDOMX / C3POOL
 # Intel / AMD
 # Worker automático pelo hostname
+# Instala XMRig automaticamente se não existir
 # ============================================================
 
 set -u
@@ -13,28 +14,35 @@ set -u
 # CONFIGURAÇÕES
 # ============================================================
 
-XMRIG_PATH="/opt/xmrig/xmrig"
-XMRIG_CONFIG="/opt/xmrig/config.json"
+XMRIG_DIR="/home/wendell/c3pool"
+XMRIG_PATH="$XMRIG_DIR/xmrig"
+XMRIG_CONFIG="$XMRIG_DIR/config_custom.json"
 
-LOGFILE="/var/log/SRBMOEDA1.log"
-ERROR_LOG="/var/log/error.log"
+LOGFILE="/var/log/XMRIG_C3POOL.log"
+ERROR_LOG="/var/log/XMRIG_C3POOL_error.log"
 
-# Dificuldade fixa 1000 anexada ao endereço da carteira
-WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy+1000"
+# ============================================================
+# CARTEIRA MONERO
+# ============================================================
 
-# Porta 3333 = baixa dificuldade inicial + suporta dificuldade fixa via +N
-# NÃO usar TLS nesta porta (o sufixo +1000 só funciona sem TLS)
-POOL="pool.supportxmr.com:3333"
+WALLET="44d4WZVR3vvYBKbvhoPY3Qa7oncbpYPz3M6G1BWp19JW9EjX7yWfJupB32SRaa5deaDey6YjLpGEmQ24gB315RHFS2Echuy"
 
+# ============================================================
+# C3POOL
+# ============================================================
+
+POOL="auto.c3pool.org:80"
+
+# Worker automático
 WORKER="$(hostname)"
-ASM="auto"
 
 # ============================================================
 # LOGS
 # ============================================================
 
-mkdir -p /opt/xmrig
-touch "$LOGFILE" "$ERROR_LOG"
+mkdir -p "$XMRIG_DIR"
+
+touch "$LOGFILE" "$ERROR_LOG" 2>/dev/null || true
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOGFILE"
@@ -45,13 +53,68 @@ error() {
 }
 
 # ============================================================
-# VERIFICAR XMRIG
+# INSTALAR XMRIG C3POOL SE NÃO EXISTIR
+# ============================================================
+
+echo
+echo "=================================================="
+echo "          VERIFICANDO XMRIG / C3POOL"
+echo "=================================================="
+
+if [ ! -x "$XMRIG_PATH" ]; then
+
+    echo
+    echo "XMRig não encontrado em:"
+    echo "$XMRIG_PATH"
+    echo
+    echo "Baixando e instalando XMRig pelo instalador oficial"
+    echo "do C3Pool..."
+    echo
+
+    log "XMRig não encontrado. Iniciando instalação C3Pool."
+
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "ERRO: curl não está instalado."
+        error "curl não encontrado."
+        exit 1
+    fi
+
+    curl -s -L \
+        https://download.c3pool.org/xmrig_setup/raw/master/setup_c3pool_miner.sh \
+        | LC_ALL=en_US.UTF-8 bash -s "$WALLET"
+
+    RESULT=$?
+
+    if [ "$RESULT" -ne 0 ]; then
+        echo
+        echo "ERRO: Falha na instalação do XMRig pelo C3Pool."
+        error "Instalação C3Pool falhou. Código: $RESULT"
+        exit 1
+    fi
+
+    echo
+    echo "Instalação concluída."
+    log "Instalação C3Pool concluída."
+
+fi
+
+# ============================================================
+# VERIFICAR NOVAMENTE XMRIG
 # ============================================================
 
 if [ ! -x "$XMRIG_PATH" ]; then
-    error "XMRig não encontrado: $XMRIG_PATH"
+    echo
+    echo "ERRO: XMRig ainda não foi encontrado após a instalação:"
+    echo "$XMRIG_PATH"
+    error "XMRig não encontrado após instalação."
     exit 1
 fi
+
+echo
+echo "XMRig encontrado:"
+echo "$XMRIG_PATH"
+
+log "XMRig encontrado: $XMRIG_PATH"
 
 # ============================================================
 # DETECTAR CPU
@@ -78,30 +141,22 @@ CPU_PHYSICAL="$(lscpu -p=CORE |
 [ "$CPU_PHYSICAL" -lt 1 ] && CPU_PHYSICAL=1
 
 # ============================================================
-# DETECTAR ASM - SH COMPATÍVEL
+# DEFINIR THREADS RANDOMX
 # ============================================================
 
-case "$CPU_VENDOR" in
-    GenuineIntel)
-        ASM="intel"
-        ;;
-    AuthenticAMD)
-        case "$CPU_MODEL" in
-            *FX-*|*Opteron*|*Bulldozer*|*Piledriver*|*Steamroller*|*Excavator*)
-                ASM="bulldozer"
-                ;;
-            *Ryzen*|*Threadripper*|*EPYC*)
-                ASM="ryzen"
-                ;;
-            *)
-                ASM="auto"
-                ;;
-        esac
-        ;;
-    *)
-        ASM="auto"
-        ;;
-esac
+# Para o i7-3770:
+# 4 cores físicos / 8 threads
+# Benchmark do C3Pool: ~2441 H/s usando 4 threads.
+#
+# Portanto usamos os 4 cores físicos.
+
+if [ "$CPU_PHYSICAL" -ge 4 ]; then
+    RX_THREADS=4
+else
+    RX_THREADS="$CPU_PHYSICAL"
+fi
+
+[ "$RX_THREADS" -lt 1 ] && RX_THREADS=1
 
 # ============================================================
 # MOSTRAR CONFIGURAÇÃO
@@ -109,63 +164,100 @@ esac
 
 echo
 echo "=================================================="
-echo "             XMRIG - SUPPORTXMR"
+echo "             XMRIG - C3POOL"
 echo "=================================================="
 echo "CPU.............: $CPU_MODEL"
 echo "Vendor..........: $CPU_VENDOR"
 echo "Cores físicos...: $CPU_PHYSICAL"
-echo "Threads.........: $CPU_THREADS"
-echo "ASM.............: $ASM"
+echo "Threads sistema.: $CPU_THREADS"
+echo "Threads RandomX.: $RX_THREADS"
 echo "Worker..........: $WORKER"
-echo "Carteira........: $(printf '%s' "$WALLET" | cut -c1-12)...+1000"
 echo "Pool............: $POOL"
 echo "Algoritmo.......: rx/0"
-echo "TLS.............: Desativado (porta 3333)"
-echo "Dificuldade.....: 1000 (fixa)"
+echo "TLS.............: Desativado"
+echo "Huge Pages......: Ativado"
 echo "=================================================="
 echo
 
-log "Iniciando XMRig - SupportXMR"
+log "Iniciando XMRig C3Pool"
 log "CPU: $CPU_MODEL"
 log "Vendor: $CPU_VENDOR"
-log "Threads: $CPU_THREADS"
-log "ASM: $ASM"
+log "Cores físicos: $CPU_PHYSICAL"
+log "Threads sistema: $CPU_THREADS"
+log "Threads RandomX: $RX_THREADS"
 log "Worker: $WORKER"
 log "Pool: $POOL"
-log "Dificuldade: 1000"
 
 # ============================================================
 # GERAR CONFIG.JSON
 # ============================================================
 
-export WALLET POOL WORKER ASM LOGFILE
+export WALLET
+export POOL
+export WORKER
+export LOGFILE
+export XMRIG_CONFIG
+export RX_THREADS
 
 python3 <<'PY'
 
 import json
 import os
 
+rx_threads = int(os.environ["RX_THREADS"])
+
+# ============================================================
+# THREAD AFFINITY
+# ============================================================
+
+rx_threads_config = list(range(rx_threads))
+
 config = {
+    "api": {
+        "id": None,
+        "worker-id": None
+    },
+
+    "http": {
+        "enabled": False,
+        "host": "127.0.0.1",
+        "port": 0,
+        "access-token": None,
+        "restricted": True
+    },
+
     "autosave": False,
     "background": False,
     "colors": True,
     "title": True,
 
     "randomx": {
+        "init": -1,
+        "init-avx2": 0,
         "mode": "auto",
         "1gb-pages": False,
         "rdmsr": True,
         "wrmsr": True,
-        "numa": True
+        "cache_qos": False,
+        "numa": True,
+        "scratchpad_prefetch_mode": 1
     },
 
     "cpu": {
         "enabled": True,
         "huge-pages": True,
+        "huge-pages-jit": False,
+        "hw-aes": None,
+
         "priority": 2,
-        "yield": False,
-        "max-threads-hint": 100,
-        "asm": os.environ["ASM"]
+
+        "memory-pool": True,
+
+        "yield": True,
+
+        "asm": True,
+
+        "rx": rx_threads_config
     },
 
     "opencl": {
@@ -183,21 +275,62 @@ config = {
             "url": os.environ["POOL"],
             "user": os.environ["WALLET"],
             "pass": os.environ["WORKER"],
+
+            "rig-id": None,
+
+            "nicehash": False,
             "keepalive": True,
             "enabled": True,
-            "tls": False
+
+            "tls": False,
+            "sni": False,
+
+            "tls-fingerprint": None,
+
+            "daemon": False,
+
+            "socks5": None,
+            "self-select": None,
+
+            "submit-to-origin": False
         }
     ],
 
-    "retries": 10,
+    "retries": 5,
     "retry-pause": 5,
+
     "print-time": 60,
-    "health-print-time": 60,
-    "log-file": os.environ["LOGFILE"],
-    "donate-level": 0
+
+    "dmi": True,
+    "syslog": False,
+
+    "tls": {
+        "enabled": False,
+        "protocols": None,
+        "cert": None,
+        "cert_key": None,
+        "ciphers": None,
+        "ciphersuites": None,
+        "dhparam": None
+    },
+
+    "dns": {
+        "ip_version": 0,
+        "ttl": 30
+    },
+
+    "user-agent": None,
+
+    "verbose": 0,
+
+    "watch": True,
+
+    "donate-level": 0,
+
+    "donate-over-proxy": 1
 }
 
-path = "/opt/xmrig/config.json"
+path = os.environ["XMRIG_CONFIG"]
 
 with open(path, "w") as f:
     json.dump(config, f, indent=4)
@@ -206,8 +339,12 @@ print("Config gerado:", path)
 
 PY
 
+# ============================================================
+# VERIFICAR GERAÇÃO DO CONFIG
+# ============================================================
+
 if [ "$?" -ne 0 ]; then
-    error "Falha ao gerar config.json"
+    error "Falha ao gerar config_custom.json"
     exit 1
 fi
 
@@ -216,18 +353,28 @@ fi
 # ============================================================
 
 if ! python3 -m json.tool "$XMRIG_CONFIG" > /dev/null 2>&1; then
-    error "Configuração JSON inválida"
+
+    echo
+    echo "ERRO: configuração JSON inválida."
+    error "Configuração JSON inválida."
+
     exit 1
 fi
+
+echo
+echo "Configuração validada:"
+echo "$XMRIG_CONFIG"
 
 log "Configuração JSON validada."
 
 # ============================================================
-# VALIDAR XMRIG
+# DRY RUN
 # ============================================================
 
 echo
-echo "VALIDANDO CONFIGURAÇÃO XMRIG..."
+echo "=================================================="
+echo "       VALIDANDO CONFIGURAÇÃO DO XMRIG"
+echo "=================================================="
 echo
 
 "$XMRIG_PATH" \
@@ -238,7 +385,15 @@ echo
 RESULT=$?
 
 if [ "$RESULT" -ne 0 ]; then
+
+    echo
+    echo "ERRO: XMRig rejeitou a configuração."
+    echo
+    echo "Veja o erro:"
+    tail -30 "$ERROR_LOG"
+
     error "XMRig rejeitou a configuração."
+
     exit 1
 fi
 
@@ -252,14 +407,18 @@ echo
 echo "=================================================="
 echo "             MINERAÇÃO INICIADA"
 echo "=================================================="
-echo "Pool: $POOL"
-echo "Worker: $WORKER"
-echo "Threads: $CPU_THREADS"
-echo "ASM: $ASM"
-echo "Dificuldade: 1000"
+echo "Pool............: $POOL"
+echo "Worker..........: $WORKER"
+echo "Algoritmo.......: rx/0"
+echo "Threads RandomX.: $RX_THREADS"
+echo "Huge Pages......: Ativado"
+echo "TLS.............: Desativado"
 echo "=================================================="
 echo
+
+log "Mineração iniciada."
 
 exec "$XMRIG_PATH" \
     --config="$XMRIG_CONFIG" \
     >> "$LOGFILE" 2>> "$ERROR_LOG"
+```
