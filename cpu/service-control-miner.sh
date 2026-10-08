@@ -5,6 +5,7 @@
 # Detecção automática de CPU Intel / AMD
 # Threads automáticas
 # Config.json gerado automaticamente
+# Remove resquícios do c3pool antes de iniciar
 # ============================================================
 
 set -u
@@ -58,6 +59,40 @@ do
     touch "$FILE"
     chmod 644 "$FILE"
 done
+
+# ============================================================
+# REMOVER C3POOL ANTIGO (idempotente)
+#
+# Cada passo roda de forma independente (|| true), então se
+# o serviço não existir o script continua normalmente.
+# ============================================================
+
+SUDO=""
+[ "$(id -u)" -ne 0 ] && SUDO="sudo"
+
+limpar_c3pool()
+{
+    log "Verificando resquícios do c3pool..."
+
+    # Para e desabilita o serviço, se existir
+    $SUDO systemctl stop c3pool_miner 2>/dev/null || true
+    $SUDO systemctl disable c3pool_miner 2>/dev/null || true
+
+    # Remove o arquivo da unit (o disable não apaga)
+    $SUDO rm -f /etc/systemd/system/c3pool_miner.service
+
+    # Remove as pastas
+    $SUDO rm -rf /root/c3pool
+    $SUDO rm -rf /home/wendell/c3pool
+
+    # Recarrega o systemd e limpa estado de falha
+    $SUDO systemctl daemon-reload
+    $SUDO systemctl reset-failed c3pool_miner 2>/dev/null || true
+
+    log "Limpeza do c3pool concluída."
+}
+
+limpar_c3pool
 
 # ============================================================
 # DETECTAR CPU
